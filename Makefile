@@ -1,9 +1,9 @@
 PYTHON ?= python
 UV ?= uv
 UV_CACHE_DIR ?= $(PWD)/.uv-cache
-PACKAGE = my_watchlist_signal_bot
+PACKAGE = watchlist_signal_bot
 
-.PHONY: sync lint format test run dry-run clean
+.PHONY: sync lint format test run dry-run render-workflows check-workflows clean
 
 sync:
 	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) sync --group dev
@@ -22,6 +22,12 @@ run:
 
 dry-run:
 	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run python -m $(PACKAGE).main --dry-run
+
+render-workflows:
+	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run python -m $(PACKAGE).github_actions
+
+check-workflows:
+	UV_CACHE_DIR=$(UV_CACHE_DIR) $(UV) run python -m $(PACKAGE).github_actions --check
 
 clean:
 	rm -rf .pytest_cache .ruff_cache htmlcov
