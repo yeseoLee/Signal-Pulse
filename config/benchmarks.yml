@@ -8,6 +8,11 @@ symbols:
     market: KR
     name: KOSPI
     asset_type: index
+  KOSDAQ:
+    symbol: KQ11
+    market: KR
+    name: KOSDAQ
+    asset_type: index
   SPY:
     symbol: SPY
     market: US

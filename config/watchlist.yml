@@ -1,50 +1,48 @@
 groups:
   core_kr:
-    - 005930
-    - 000660
-    - 035420
-    - 051910
+    - "005930"
+    - "000660"
+    - "005380"
   core_us:
     - AAPL
     - MSFT
     - NVDA
     - AMZN
-  etf:
-    - SPY
+    - META
+    - GOOGL
+    - TSLA
+  etf_us:
     - QQQ
-    - SOXX
-    - KODEX200
+    - SPY
+  etf_kr:
+    - "069500"
+    - "229200"
 
 metadata:
-  005930:
+  "005930":
     market: KR
     name: 삼성전자
     benchmark: KOSPI
     asset_type: equity
-  000660:
+  "000660":
     market: KR
     name: SK하이닉스
     benchmark: KOSPI
     asset_type: equity
-  035420:
+  "005380":
     market: KR
-    name: NAVER
-    benchmark: KOSPI
-    asset_type: equity
-  051910:
-    market: KR
-    name: LG화학
+    name: 현대차
     benchmark: KOSPI
     asset_type: equity
   AAPL:
     market: US
     name: Apple
-    benchmark: SPY
+    benchmark: QQQ
     asset_type: equity
   MSFT:
     market: US
     name: Microsoft
-    benchmark: SPY
+    benchmark: QQQ
     asset_type: equity
   NVDA:
     market: US
@@ -54,6 +52,21 @@ metadata:
   AMZN:
     market: US
     name: Amazon
+    benchmark: QQQ
+    asset_type: equity
+  META:
+    market: US
+    name: Meta Platforms
+    benchmark: QQQ
+    asset_type: equity
+  GOOGL:
+    market: US
+    name: Alphabet Class A
+    benchmark: QQQ
+    asset_type: equity
+  TSLA:
+    market: US
+    name: Tesla
     benchmark: QQQ
     asset_type: equity
   SPY:
@@ -66,13 +79,13 @@ metadata:
     name: Invesco QQQ
     benchmark: SPY
     asset_type: etf
-  SOXX:
-    market: US
-    name: iShares Semiconductor ETF
-    benchmark: QQQ
-    asset_type: etf
-  KODEX200:
+  "069500":
     market: KR
     name: KODEX 200
     benchmark: KOSPI
+    asset_type: etf
+  "229200":
+    market: KR
+    name: KODEX 코스닥150
+    benchmark: KOSDAQ
     asset_type: etf
