@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Watchlist Signal Bot</title>
+    <style>
+      :root {
+        --bg: #f4efe6;
+        --panel: rgba(255, 250, 241, 0.82);
+        --ink: #13212e;
+        --muted: #617080;
+        --accent: #cf5c36;
+        --accent-2: #1e847f;
+        --accent-3: #c7a84f;
+        --danger: #912f40;
+        --border: rgba(19, 33, 46, 0.12);
+        --shadow: 0 18px 40px rgba(19, 33, 46, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(207, 92, 54, 0.15), transparent 28%),
+          radial-gradient(circle at top right, rgba(30, 132, 127, 0.16), transparent 22%),
+          linear-gradient(180deg, #fff7ec 0%, #f4efe6 100%);
+      }
+
+      .page {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 32px 20px 72px;
+      }
+
+      .hero {
+        display: grid;
+        gap: 20px;
+        grid-template-columns: 1.6fr 1fr;
+        align-items: stretch;
+      }
+
+      .hero-main,
+      .hero-side,
+      .panel,
+      .symbol-card {
+        background: var(--panel);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .hero-main {
+        padding: 28px;
+      }
+
+      .hero-side {
+        padding: 24px;
+        display: grid;
+        gap: 14px;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+
+      h1 {
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-size: clamp(2.2rem, 5vw, 3.4rem);
+        letter-spacing: -0.04em;
+        line-height: 0.95;
+      }
+
+      h2 {
+        font-family: "IBM Plex Serif", Georgia, serif;
+        font-size: 1.6rem;
+        margin-bottom: 16px;
+      }
+
+      .subtle {
+        color: var(--muted);
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 28px;
+      }
+
+      .stat {
+        padding: 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.58);
+        border: 1px solid rgba(19, 33, 46, 0.08);
+      }
+
+      .stat strong {
+        display: block;
+        font-size: 1.7rem;
+        margin-bottom: 6px;
+      }
+
+      .section {
+        margin-top: 26px;
+      }
+
+      .panel {
+        padding: 22px;
+      }
+
+      .grid-2 {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      .grid-3 {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      th,
+      td {
+        padding: 10px 0;
+        text-align: left;
+        border-bottom: 1px solid rgba(19, 33, 46, 0.08);
+        vertical-align: top;
+      }
+
+      th {
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      .symbol-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 18px;
+      }
+
+      .symbol-card {
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .symbol-card::after {
+        content: "";
+        position: absolute;
+        inset: auto -30px -30px auto;
+        width: 120px;
+        height: 120px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(207, 92, 54, 0.18), transparent);
+      }
+
+      .symbol-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 12px;
+      }
+
+      .symbol-header strong {
+        display: block;
+        font-size: 1.2rem;
+      }
+
+      .score {
+        text-align: right;
+      }
+
+      .score strong {
+        font-size: 2rem;
+        line-height: 1;
+      }
+
+      .badge-row,
+      .metric-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        border: 1px solid transparent;
+      }
+
+      .badge-positive {
+        background: rgba(30, 132, 127, 0.1);
+        color: var(--accent-2);
+        border-color: rgba(30, 132, 127, 0.16);
+      }
+
+      .badge-neutral {
+        background: rgba(199, 168, 79, 0.12);
+        color: #7a6121;
+        border-color: rgba(199, 168, 79, 0.18);
+      }
+
+      .badge-negative {
+        background: rgba(145, 47, 64, 0.11);
+        color: var(--danger);
+        border-color: rgba(145, 47, 64, 0.18);
+      }
+
+      .metric {
+        min-width: 74px;
+        padding: 10px 12px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(19, 33, 46, 0.08);
+      }
+
+      .metric span {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-bottom: 4px;
+      }
+
+      .sparkline {
+        width: 100%;
+        height: 68px;
+        margin: 12px 0 16px;
+      }
+
+      .sparkline polyline {
+        fill: none;
+        stroke: var(--accent);
+        stroke-width: 3;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .footer-note {
+        margin-top: 20px;
+        color: var(--muted);
+        font-size: 0.92rem;
+      }
+
+      @media (max-width: 900px) {
+        .hero,
+        .grid-2,
+        .grid-3,
+        .stat-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <div class="hero-main">
+          <p class="subtle">Rule-Based Daily Watchlist Monitor</p>
+          <h1>My Watchlist Signal Bot</h1>
+          <p class="subtle" style="margin-top: 14px; max-width: 680px;">
+            Daily signal digest for KR and US watchlists with fallback-aware data collection,
+            momentum ranking, and explainable technical triggers.
+          </p>
+          <div class="stat-grid">
+            <div class="stat">
+              <strong>{{ total_symbols }}</strong>
+              <span class="subtle">Tracked Symbols</span>
+            </div>
+            <div class="stat">
+              <strong>{{ signal_count }}</strong>
+              <span class="subtle">Signal Names</span>
+            </div>
+            <div class="stat">
+              <strong>{{ bullish_count }}</strong>
+              <span class="subtle">Bullish</span>
+            </div>
+            <div class="stat">
+              <strong>{{ bearish_count }}</strong>
+              <span class="subtle">Bearish</span>
+            </div>
+          </div>
+        </div>
+        <aside class="hero-side">
+          <div>
+            <p class="subtle">As Of</p>
+            <h2 style="margin: 6px 0 0;">{{ as_of }}</h2>
+          </div>
+          <div>
+            <p class="subtle">Fetch Failures</p>
+            <h2 style="margin: 6px 0 0;">{{ failures|length }}</h2>
+          </div>
+          <div>
+            <p class="subtle">Benchmark Gaps</p>
+            <h2 style="margin: 6px 0 0;">{{ benchmark_failures|length }}</h2>
+          </div>
+        </aside>
+      </section>
+
+      <section class="section grid-2">
+        <div class="panel">
+          <h2>New Signals Today</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Score</th>
+                <th>New Events</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if new_signal_rows %}
+                {% for row in new_signal_rows[:12] %}
+                  <tr>
+                    <td>{{ row.symbol }}</td>
+                    <td>{{ row.score }}</td>
+                    <td>{{ row.new_events }}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="3" class="subtle">No brand-new events in the latest history slice.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Per-Group Summary</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Group</th>
+                <th>Count</th>
+                <th>Avg Score</th>
+                <th>Bullish</th>
+                <th>Bearish</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for row in group_summary %}
+                <tr>
+                  <td>{{ row.group }}</td>
+                  <td>{{ row.count }}</td>
+                  <td>{{ row.avg_score }}</td>
+                  <td>{{ row.bullish }}</td>
+                  <td>{{ row.bearish }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section grid-3">
+        <div class="panel">
+          <h2>Strong Momentum</h2>
+          <table>
+            <tbody>
+              {% for card in strong_momentum %}
+                <tr>
+                  <td>
+                    <strong>{{ card.symbol }}</strong> {{ card.name }}<br />
+                    <span class="subtle">{{ card.state }} | {{ card.events|map(attribute='code')|join(', ') }}</span>
+                  </td>
+                  <td>{{ card.score }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Pullback Candidates</h2>
+          <table>
+            <tbody>
+              {% if pullbacks %}
+                {% for card in pullbacks %}
+                  <tr>
+                    <td>
+                      <strong>{{ card.symbol }}</strong> {{ card.name }}<br />
+                      <span class="subtle">{{ card.state }}</span>
+                    </td>
+                    <td>{{ card.score }}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="2" class="subtle">No pullback-in-uptrend candidates today.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Weakening Names</h2>
+          <table>
+            <tbody>
+              {% for card in weakening %}
+                <tr>
+                  <td>
+                    <strong>{{ card.symbol }}</strong> {{ card.name }}<br />
+                    <span class="subtle">{{ card.state }} | {{ card.events|map(attribute='code')|join(', ') }}</span>
+                  </td>
+                  <td>{{ card.score }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <h2>Per-Symbol Detail Cards</h2>
+        <div class="symbol-grid">
+          {% for card in all_symbols %}
+            <article class="symbol-card">
+              <div class="symbol-header">
+                <div>
+                  <strong>{{ card.symbol }}</strong>
+                  <p>{{ card.name }}</p>
+                  <p class="subtle">{{ card.market }} | {{ card.group }} | Benchmark {{ card.benchmark }}</p>
+                </div>
+                <div class="score">
+                  <strong>{{ card.score }}</strong>
+                  <p class="subtle">{{ card.state }}</p>
+                  <p class="subtle">{{ card.confidence }} confidence</p>
+                </div>
+              </div>
+              <p class="subtle">Price {{ card.price }} | {{ card.source }} | {{ card.data_quality }}</p>
+              <svg class="sparkline" viewBox="0 0 220 64" preserveAspectRatio="none">
+                <polyline points="{{ card.sparkline_points }}"></polyline>
+              </svg>
+              <div class="badge-row">
+                {% for event in card.events %}
+                  <span class="badge {{ event.class_name }}">{{ event.code }}</span>
+                {% endfor %}
+              </div>
+              <div class="metric-row" style="margin-top: 14px;">
+                {% for metric in card.metrics %}
+                  <div class="metric">
+                    <span>{{ metric.label }}</span>
+                    <strong>{{ metric.value }}</strong>
+                  </div>
+                {% endfor %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="section grid-2">
+        <div class="panel">
+          <h2>Data Quality</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Symbol</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if failures %}
+                {% for symbol, reason in failures.items() %}
+                  <tr>
+                    <td>{{ symbol }}</td>
+                    <td>{{ reason }}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="2" class="subtle">No symbol-level failures.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+        <div class="panel">
+          <h2>Benchmark Status</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Benchmark</th>
+                <th>Reason</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if benchmark_failures %}
+                {% for symbol, reason in benchmark_failures.items() %}
+                  <tr>
+                    <td>{{ symbol }}</td>
+                    <td>{{ reason }}</td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="2" class="subtle">All benchmarks fetched successfully.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <p class="footer-note">
+        Signals are prioritization aids, not trade recommendations. External sources may fall back to
+        cached data when live fetches fail.
+      </p>
+    </div>
+  </body>
+</html>
