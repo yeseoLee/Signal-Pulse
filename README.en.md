@@ -102,22 +102,85 @@ Included examples:
 
 Defines GitHub Actions settings.
 
-- `shared`: Python/uv versions, runner, permissions, and shared environment variables
-- `workflows.daily.schedule`: cron schedules for recurring runs
-- `workflows.*.dispatch_inputs`: manual workflow input definitions
-- `workflows.*.runtime_artifact`: uploaded artifact names and paths
-- `workflows.*.pages`: GitHub Pages bundle files and deploy conditions
+- `daily.schedule`: cron schedules for recurring runs
+- `daily.options`: default options for the daily workflow
+- `manual.options`: default options for the manual workflow
 
 Important:
 
 - GitHub Actions cannot load `schedule` dynamically from a config file at runtime.
 - Because of that, this project uses [`config/github_actions.yml`](./config/github_actions.yml) as the source of truth and keeps [`.github/workflows/`](./.github/workflows/) YAML files as generated outputs.
+- This file is intentionally limited to user-facing customization values such as cron entries and workflow option defaults.
+- Developer-facing values such as runner type, permissions, artifact paths, and Python/uv versions are kept inside the generator as internal defaults.
 - After changing the config, regenerate the workflow files.
 
 ```bash
 make render-workflows
 make check-workflows
 ```
+
+## Signal Components
+
+The Telegram summary no longer relies on only one total score. It also uses per-indicator scores for the categories below.
+
+### Moving Average
+
+- `close > SMA20`, `close > SMA60`, `close > SMA120`
+- alignment check for `SMA20 > SMA60 > SMA120`
+- `GOLDEN_CROSS`, `DEAD_CROSS`
+- long-term average breakdown check
+
+This category measures whether the trend structure is healthy and aligned.
+
+### Breakout / Breakdown
+
+- `BREAKOUT_20D`
+- `BREAKOUT_60D`
+- `120-day high breakout`
+- `WATCH_NEAR_BREAKOUT`
+- `BREAKDOWN_20D`
+
+This category measures whether price is pushing through recent ranges or losing support.
+
+### RSI
+
+- Uses `RSI(14)`.
+- The `45~70` zone is treated as constructive.
+- Overheated conditions are penalized through `RSI_OVERHEATED`.
+
+This category measures balance between strength and overheating.
+
+### Volume
+
+- `volume / 20-day average volume`
+- accumulation on up days
+- `VOLUME_CONFIRMED_BREAKOUT`
+- `HIGH_VOLUME_SELLING`
+
+This category checks whether price action is confirmed by volume or pressured by selling.
+
+### Relative Strength
+
+- `relative_return_20d`
+- `relative_return_60d`
+- `RS_GT_BENCHMARK`
+- `RS_WEAKENING`
+
+This category measures whether the symbol is outperforming or weakening versus its benchmark.
+
+### Momentum
+
+- `20-day`, `60-day`, and `120-day` returns
+- `MOMENTUM_ACCELERATING`
+
+This category measures whether upside speed and mid-term momentum are still improving.
+
+### How To Read Telegram Output
+
+- `Top Bullish` is sorted by the sum of positive per-indicator scores.
+- `Top Risk` is sorted by the sum of negative per-indicator scores.
+- The `indicator scores` line is shown in this order:
+  `moving average / breakout / RSI / volume / relative strength / momentum`.
 
 ## Environment Variables
 

@@ -102,22 +102,84 @@ groups:
 
 GitHub Actions 관련 설정을 관리합니다.
 
-- `shared`: Python/uv 버전, runner, permissions, 공통 환경 변수
-- `workflows.daily.schedule`: 정기 실행 cron
-- `workflows.*.dispatch_inputs`: 수동 실행 입력값 정의
-- `workflows.*.runtime_artifact`: 업로드할 artifact 이름과 경로
-- `workflows.*.pages`: GitHub Pages 번들 파일과 배포 조건
+- `daily.schedule`: 정기 실행 cron
+- `daily.options`: daily workflow 기본 옵션
+- `manual.options`: manual workflow 기본 옵션
 
 중요:
 
 - GitHub Actions의 `schedule`은 런타임에 설정 파일을 읽을 수 없습니다.
 - 그래서 이 프로젝트는 [`config/github_actions.yml`](./config/github_actions.yml)을 소스로 사용하고, [`.github/workflows/`](./.github/workflows/) 아래 YAML은 생성물로 관리합니다.
+- 이 파일에는 사용자가 바꿔도 되는 값만 둡니다. 예를 들어 `cron`, `market 기본값`, `dry_run 기본값`, `publish_pages 기본값` 같은 항목입니다.
+- runner, permissions, artifact 경로, Python/uv 버전 같은 개발자용 값은 생성기 내부 기본값으로 관리합니다.
 - 설정 변경 후 아래 명령으로 워크플로를 다시 생성해야 합니다.
 
 ```bash
 make render-workflows
 make check-workflows
 ```
+
+## 신호 계산 항목
+
+텔레그램 요약은 종합 점수 하나만 보여주지 않고, 아래 지표별 점수를 함께 사용합니다.
+
+### 이동평균
+
+- `close > SMA20`, `close > SMA60`, `close > SMA120`
+- `SMA20 > SMA60 > SMA120` 정배열 여부
+- `GOLDEN_CROSS`, `DEAD_CROSS`
+- 장기선 하회 여부
+
+이 항목은 추세의 방향과 이동평균 구조가 건강한지 판단합니다.
+
+### 돌파 / 이탈
+
+- `BREAKOUT_20D`
+- `BREAKOUT_60D`
+- `120일 고점 돌파`
+- `WATCH_NEAR_BREAKOUT`
+- `BREAKDOWN_20D`
+
+이 항목은 가격이 최근 박스 상단을 돌파하는지, 또는 반대로 지지 구간을 이탈하는지 판단합니다.
+
+### RSI
+
+- `RSI(14)`를 사용합니다.
+- 일반적으로 `45~70` 구간은 우호적으로 봅니다.
+- 과열 구간은 `RSI_OVERHEATED`로 감점합니다.
+
+이 항목은 추세 안의 과열 여부와 강도의 균형을 봅니다.
+
+### 거래량
+
+- `volume / 20일 평균 거래량`
+- 상승일 거래량 증가 여부
+- `VOLUME_CONFIRMED_BREAKOUT`
+- `HIGH_VOLUME_SELLING`
+
+이 항목은 가격 움직임이 거래량으로 확인되는지, 혹은 매도 압력이 커지는지 판단합니다.
+
+### 상대강도
+
+- `relative_return_20d`
+- `relative_return_60d`
+- `RS_GT_BENCHMARK`
+- `RS_WEAKENING`
+
+이 항목은 종목이 벤치마크보다 강한지, 약해지고 있는지를 판단합니다.
+
+### 모멘텀
+
+- `20일`, `60일`, `120일` 수익률
+- `MOMENTUM_ACCELERATING`
+
+이 항목은 상승 속도가 유지되는지, 중기 흐름이 가속되는지 판단합니다.
+
+### 텔레그램 해석 방법
+
+- `상위 강세`는 지표별 점수의 양수 합이 큰 종목 순으로 정렬합니다.
+- `상위 위험`은 지표별 점수의 음수 합이 큰 종목 순으로 정렬합니다.
+- 각 줄의 `지표점수`는 `이평 / 돌파 / RSI / 거래량 / 상대강도 / 모멘텀` 순서입니다.
 
 ## 환경 변수
 
