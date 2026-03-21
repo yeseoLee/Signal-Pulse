@@ -1,0 +1,107 @@
+name: Daily Signal Bot
+
+on:
+  schedule:
+    - cron: "35 7 * * 1-5"
+    - cron: "35 22 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      market:
+        description: "Optional market filter"
+        required: false
+        default: "ALL"
+        type: choice
+        options:
+          - ALL
+          - KR
+          - US
+      dry_run:
+        description: "Skip Telegram delivery"
+        required: false
+        default: true
+        type: boolean
+      publish_pages:
+        description: "Deploy HTML report to GitHub Pages"
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+  pages: write
+
+concurrency:
+  group: daily-signal-bot-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      MARKET: ${{ github.event.inputs.market || 'ALL' }}
+      DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.6.11"
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run signal bot
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmd=(uv run python -m my_watchlist_signal_bot.main)
+          if [[ "${MARKET}" != "" && "${MARKET}" != "ALL" ]]; then
+            cmd+=(--market "${MARKET}")
+          fi
+          if [[ "${DRY_RUN}" == "true" || -z "${TELEGRAM_BOT_TOKEN}" || -z "${TELEGRAM_CHAT_ID}" ]]; then
+            cmd+=(--dry-run)
+          fi
+          "${cmd[@]}"
+
+      - name: Prepare Pages bundle
+        run: |
+          mkdir -p public
+          cp artifacts/report.html public/index.html
+          cp artifacts/report.json public/report.json
+          cp artifacts/signals_daily.csv public/signals_daily.csv
+          cp artifacts/signal_history.csv public/signal_history.csv
+
+      - name: Upload runtime artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: signal-bot-artifacts
+          path: |
+            artifacts
+            data/prices
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    if: ${{ github.event_name == 'schedule' || github.event.inputs.publish_pages != 'false' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,114 @@
+name: Manual Signal Bot Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      symbol:
+        description: "Optional single symbol filter"
+        required: false
+        type: string
+      group:
+        description: "Optional group filter"
+        required: false
+        type: string
+      market:
+        description: "Optional market filter"
+        required: false
+        default: "ALL"
+        type: choice
+        options:
+          - ALL
+          - KR
+          - US
+      dry_run:
+        description: "Skip Telegram delivery"
+        required: false
+        default: true
+        type: boolean
+      publish_pages:
+        description: "Deploy generated report to GitHub Pages"
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+  id-token: write
+  pages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      SYMBOL: ${{ github.event.inputs.symbol }}
+      GROUP: ${{ github.event.inputs.group }}
+      MARKET: ${{ github.event.inputs.market || 'ALL' }}
+      DRY_RUN: ${{ github.event.inputs.dry_run || 'true' }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: "0.6.11"
+
+      - name: Install dependencies
+        run: uv sync --group dev
+
+      - name: Run manual scenario
+        shell: bash
+        run: |
+          set -euo pipefail
+          cmd=(uv run python -m my_watchlist_signal_bot.main)
+          if [[ "${MARKET}" != "" && "${MARKET}" != "ALL" ]]; then
+            cmd+=(--market "${MARKET}")
+          fi
+          if [[ -n "${GROUP}" ]]; then
+            cmd+=(--group "${GROUP}")
+          fi
+          if [[ -n "${SYMBOL}" ]]; then
+            cmd+=(--symbol "${SYMBOL}")
+          fi
+          if [[ "${DRY_RUN}" == "true" || -z "${TELEGRAM_BOT_TOKEN}" || -z "${TELEGRAM_CHAT_ID}" ]]; then
+            cmd+=(--dry-run)
+          fi
+          "${cmd[@]}"
+
+      - name: Upload manual artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: manual-signal-bot-artifacts
+          path: artifacts
+
+      - name: Prepare Pages bundle
+        if: ${{ github.event.inputs.publish_pages == 'true' }}
+        run: |
+          mkdir -p public
+          cp artifacts/report.html public/index.html
+          cp artifacts/report.json public/report.json
+
+      - name: Upload pages artifact
+        if: ${{ github.event.inputs.publish_pages == 'true' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    if: ${{ github.event.inputs.publish_pages == 'true' }}
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
