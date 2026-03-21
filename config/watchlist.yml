@@ -1,0 +1,78 @@
+groups:
+  core_kr:
+    - 005930
+    - 000660
+    - 035420
+    - 051910
+  core_us:
+    - AAPL
+    - MSFT
+    - NVDA
+    - AMZN
+  etf:
+    - SPY
+    - QQQ
+    - SOXX
+    - KODEX200
+
+metadata:
+  005930:
+    market: KR
+    name: 삼성전자
+    benchmark: KOSPI
+    asset_type: equity
+  000660:
+    market: KR
+    name: SK하이닉스
+    benchmark: KOSPI
+    asset_type: equity
+  035420:
+    market: KR
+    name: NAVER
+    benchmark: KOSPI
+    asset_type: equity
+  051910:
+    market: KR
+    name: LG화학
+    benchmark: KOSPI
+    asset_type: equity
+  AAPL:
+    market: US
+    name: Apple
+    benchmark: SPY
+    asset_type: equity
+  MSFT:
+    market: US
+    name: Microsoft
+    benchmark: SPY
+    asset_type: equity
+  NVDA:
+    market: US
+    name: NVIDIA
+    benchmark: SOXX
+    asset_type: equity
+  AMZN:
+    market: US
+    name: Amazon
+    benchmark: QQQ
+    asset_type: equity
+  SPY:
+    market: US
+    name: SPDR S&P 500 ETF
+    benchmark: SPY
+    asset_type: etf
+  QQQ:
+    market: US
+    name: Invesco QQQ
+    benchmark: SPY
+    asset_type: etf
+  SOXX:
+    market: US
+    name: iShares Semiconductor ETF
+    benchmark: QQQ
+    asset_type: etf
+  KODEX200:
+    market: KR
+    name: KODEX 200
+    benchmark: KOSPI
+    asset_type: etf

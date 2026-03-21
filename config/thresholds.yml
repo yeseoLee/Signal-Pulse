@@ -1,0 +1,34 @@
+lookback_days: 420
+
+moving_average:
+  short: 20
+  medium: 60
+  long: 120
+
+breakout:
+  short_window: 20
+  medium_window: 60
+  long_window: 120
+  near_breakout_buffer: 0.98
+
+volume:
+  spike_ratio: 1.8
+
+rsi:
+  period: 14
+  overbought: 70
+  oversold: 30
+
+score_weights:
+  breakout_20d: 10
+  breakout_60d: 20
+  golden_cross: 15
+  above_sma120: 10
+  rs_positive: 15
+  volume_confirmation: 10
+  momentum_accelerating: 10
+  dead_cross: -20
+  breakdown_20d: -15
+  below_sma120: -10
+  high_volume_selling: -10
+  rsi_overheated: -5

@@ -1,0 +1,25 @@
+default:
+  KR: KOSPI
+  US: SPY
+
+symbols:
+  KOSPI:
+    symbol: KS11
+    market: KR
+    name: KOSPI
+    asset_type: index
+  SPY:
+    symbol: SPY
+    market: US
+    name: SPDR S&P 500 ETF
+    asset_type: etf
+  QQQ:
+    symbol: QQQ
+    market: US
+    name: Invesco QQQ
+    asset_type: etf
+  SOXX:
+    symbol: SOXX
+    market: US
+    name: iShares Semiconductor ETF
+    asset_type: etf
