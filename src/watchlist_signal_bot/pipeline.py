@@ -4,25 +4,25 @@ from datetime import date
 
 import pandas as pd
 
-from my_watchlist_signal_bot.fetchers import FDRFetcher, PykrxFetcher, YFinanceFetcher
-from my_watchlist_signal_bot.indicators import (
+from watchlist_signal_bot.fetchers import FDRFetcher, PykrxFetcher, YFinanceFetcher
+from watchlist_signal_bot.indicators import (
     add_momentum_indicators,
     add_relative_strength,
     add_trend_indicators,
     add_volatility_indicators,
     add_volume_indicators,
 )
-from my_watchlist_signal_bot.models import AnalysisResult, FetchOutcome, SymbolConfig
-from my_watchlist_signal_bot.normalize import normalize_ohlcv
-from my_watchlist_signal_bot.signals import (
+from watchlist_signal_bot.models import AnalysisResult, FetchOutcome, SymbolConfig
+from watchlist_signal_bot.normalize import normalize_ohlcv
+from watchlist_signal_bot.signals import (
     classify_state,
     compute_confidence,
     compute_score,
     evaluate_signals,
 )
-from my_watchlist_signal_bot.storage import ParquetStore
-from my_watchlist_signal_bot.utils.dates import utc_now
-from my_watchlist_signal_bot.utils.retry import retry_call
+from watchlist_signal_bot.storage import ParquetStore
+from watchlist_signal_bot.utils.dates import utc_now
+from watchlist_signal_bot.utils.retry import retry_call
 
 
 def select_fetchers(symbol: SymbolConfig):

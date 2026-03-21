@@ -4,7 +4,7 @@ from typing import Any
 
 import pandas as pd
 
-from my_watchlist_signal_bot.models import Event, SymbolConfig
+from watchlist_signal_bot.models import Event, SymbolConfig
 
 
 def _event(code: str, polarity: str, title: str, weight: int, detail: str) -> Event:

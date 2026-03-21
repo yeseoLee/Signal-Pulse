@@ -4,8 +4,8 @@ from collections import Counter
 
 import requests
 
-from my_watchlist_signal_bot.models import AnalysisResult
-from my_watchlist_signal_bot.utils.logging import get_logger
+from watchlist_signal_bot.models import AnalysisResult
+from watchlist_signal_bot.utils.logging import get_logger
 
 logger = get_logger(__name__)
 

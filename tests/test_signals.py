@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import pandas as pd
 
-from my_watchlist_signal_bot.models import SymbolConfig
-from my_watchlist_signal_bot.pipeline import build_indicator_frame
-from my_watchlist_signal_bot.signals import classify_state, compute_score, evaluate_signals
+from watchlist_signal_bot.models import SymbolConfig
+from watchlist_signal_bot.pipeline import build_indicator_frame
+from watchlist_signal_bot.signals import classify_state, compute_score, evaluate_signals
 
 THRESHOLDS = {
     "moving_average": {"short": 20, "medium": 60, "long": 120},

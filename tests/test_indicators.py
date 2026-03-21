@@ -3,7 +3,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from my_watchlist_signal_bot.indicators import (
+from watchlist_signal_bot.indicators import (
     add_momentum_indicators,
     add_relative_strength,
     add_trend_indicators,

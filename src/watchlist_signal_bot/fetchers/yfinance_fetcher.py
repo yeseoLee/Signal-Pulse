@@ -6,8 +6,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from my_watchlist_signal_bot.fetchers.base import BaseFetcher, FetchError
-from my_watchlist_signal_bot.models import SymbolConfig
+from watchlist_signal_bot.fetchers.base import BaseFetcher, FetchError
+from watchlist_signal_bot.models import SymbolConfig
 
 
 class YFinanceFetcher(BaseFetcher):

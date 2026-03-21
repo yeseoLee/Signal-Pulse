@@ -4,20 +4,20 @@ import argparse
 import json
 from pathlib import Path
 
-from my_watchlist_signal_bot.pipeline import analyze_symbol, fetch_with_fallback
-from my_watchlist_signal_bot.reports.html import render_html_report
-from my_watchlist_signal_bot.reports.telegram import render_telegram_summary, send_telegram_message
-from my_watchlist_signal_bot.settings import AppSettings, load_yaml_file
-from my_watchlist_signal_bot.storage import HistoryStore, ParquetStore
-from my_watchlist_signal_bot.universe import (
+from watchlist_signal_bot.pipeline import analyze_symbol, fetch_with_fallback
+from watchlist_signal_bot.reports.html import render_html_report
+from watchlist_signal_bot.reports.telegram import render_telegram_summary, send_telegram_message
+from watchlist_signal_bot.settings import AppSettings, load_yaml_file
+from watchlist_signal_bot.storage import HistoryStore, ParquetStore
+from watchlist_signal_bot.universe import (
     build_benchmark_universe,
     filter_universe,
     load_benchmarks,
     load_watchlist,
     normalize_symbol,
 )
-from my_watchlist_signal_bot.utils.dates import build_window, resolve_end_date
-from my_watchlist_signal_bot.utils.logging import configure_logging, get_logger
+from watchlist_signal_bot.utils.dates import build_window, resolve_end_date
+from watchlist_signal_bot.utils.logging import configure_logging, get_logger
 
 logger = get_logger(__name__)
 

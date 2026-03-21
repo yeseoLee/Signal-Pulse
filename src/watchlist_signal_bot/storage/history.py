@@ -6,7 +6,7 @@ from typing import Any
 
 import pandas as pd
 
-from my_watchlist_signal_bot.models import AnalysisResult
+from watchlist_signal_bot.models import AnalysisResult
 
 
 class HistoryStore:

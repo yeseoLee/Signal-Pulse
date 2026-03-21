@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pandas as pd
 
-from my_watchlist_signal_bot.models import Event
+from watchlist_signal_bot.models import Event
 
 
 def compute_score(

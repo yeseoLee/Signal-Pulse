@@ -10,4 +10,4 @@ RUN uv sync --no-dev
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["uv", "run", "python", "-m", "my_watchlist_signal_bot.main", "--dry-run"]
+CMD ["uv", "run", "python", "-m", "watchlist_signal_bot.main", "--dry-run"]

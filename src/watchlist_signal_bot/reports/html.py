@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
-from my_watchlist_signal_bot.models import AnalysisResult, Event
+from watchlist_signal_bot.models import AnalysisResult, Event
 
 
 def render_html_report(

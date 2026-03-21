@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 
-from my_watchlist_signal_bot.models import BenchmarkConfig, SymbolConfig
-from my_watchlist_signal_bot.settings import load_yaml_file
+from watchlist_signal_bot.models import BenchmarkConfig, SymbolConfig
+from watchlist_signal_bot.settings import load_yaml_file
 
 
 def normalize_symbol(raw_symbol: str) -> str:

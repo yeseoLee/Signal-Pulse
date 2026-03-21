@@ -5,10 +5,10 @@ from datetime import date
 
 import pandas as pd
 
-from my_watchlist_signal_bot.fetchers.base import BaseFetcher
-from my_watchlist_signal_bot.models import SymbolConfig
-from my_watchlist_signal_bot.pipeline import fetch_with_fallback
-from my_watchlist_signal_bot.storage import ParquetStore
+from watchlist_signal_bot.fetchers.base import BaseFetcher
+from watchlist_signal_bot.models import SymbolConfig
+from watchlist_signal_bot.pipeline import fetch_with_fallback
+from watchlist_signal_bot.storage import ParquetStore
 
 
 class FailingFetcher(BaseFetcher):
