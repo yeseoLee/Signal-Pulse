@@ -4,7 +4,12 @@ import pandas as pd
 
 from watchlist_signal_bot.models import SymbolConfig
 from watchlist_signal_bot.pipeline import build_indicator_frame
-from watchlist_signal_bot.signals import classify_state, compute_score, evaluate_signals
+from watchlist_signal_bot.signals import (
+    classify_state,
+    compute_indicator_scores,
+    compute_score,
+    evaluate_signals,
+)
 
 THRESHOLDS = {
     "moving_average": {"short": 20, "medium": 60, "long": 120},
@@ -58,3 +63,30 @@ def test_breakout_signal_scores_as_uptrend():
     assert "VOLUME_CONFIRMED_BREAKOUT" in {event.code for event in events}
     assert score >= 60
     assert classify_state(score) in {"Uptrend", "Strong Uptrend"}
+
+
+def test_indicator_scores_capture_signal_buckets():
+    symbol = SymbolConfig(symbol="NVDA", market="US", name="NVIDIA", group="core_us")
+    prices = _breakout_frame()
+    benchmark = prices.copy()
+    benchmark["close"] = pd.Series(
+        [100 + index * 0.4 for index in range(len(benchmark))],
+        index=benchmark.index,
+        dtype="float64",
+    )
+    benchmark["open"] = benchmark["close"] * 0.995
+    benchmark["high"] = benchmark["close"] * 1.01
+    benchmark["low"] = benchmark["close"] * 0.99
+    benchmark["adj_close"] = benchmark["close"]
+
+    indicators = build_indicator_frame(prices, thresholds=THRESHOLDS, benchmark_frame=benchmark)
+    events, _, _ = evaluate_signals(indicators, symbol=symbol, thresholds=THRESHOLDS)
+    indicator_scores = compute_indicator_scores(
+        indicators.iloc[-1],
+        events=events,
+        weights=THRESHOLDS["score_weights"],
+    )
+
+    assert indicator_scores["breakout"] > 0
+    assert indicator_scores["volume"] > 0
+    assert indicator_scores["relative_strength"] > 0

@@ -58,6 +58,7 @@ class AnalysisResult:
     data_quality: str
     fetched_at: datetime | None
     indicators: dict[str, Any]
+    indicator_scores: dict[str, int]
     events: list[Event]
     display_events: list[Event]
     score: int

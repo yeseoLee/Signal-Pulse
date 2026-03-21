@@ -184,6 +184,7 @@ def build_report_payload(*, analyses, failures, benchmark_failures, history_fram
                 "group": item.config.group,
                 "state": item.state,
                 "score": item.score,
+                "indicator_scores": item.indicator_scores,
                 "confidence": item.confidence,
                 "source": item.source,
                 "data_quality": item.data_quality,

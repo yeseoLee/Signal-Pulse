@@ -17,6 +17,7 @@ from watchlist_signal_bot.normalize import normalize_ohlcv
 from watchlist_signal_bot.signals import (
     classify_state,
     compute_confidence,
+    compute_indicator_scores,
     compute_score,
     evaluate_signals,
 )
@@ -133,6 +134,11 @@ def analyze_symbol(
         events=events,
         weights=thresholds.get("score_weights", {}),
     )
+    indicator_scores = compute_indicator_scores(
+        latest,
+        events=events,
+        weights=thresholds.get("score_weights", {}),
+    )
     confidence = compute_confidence(
         latest,
         data_points=len(indicator_frame),
@@ -146,6 +152,7 @@ def analyze_symbol(
         data_quality=price_outcome.quality,
         fetched_at=price_outcome.fetched_at,
         indicators=snapshot,
+        indicator_scores=indicator_scores,
         events=events,
         display_events=display_events,
         score=score,
