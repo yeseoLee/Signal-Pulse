@@ -18,9 +18,7 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
         "file": ".github/workflows/daily.yml",
         "name": "Daily Signal Bot",
         "permissions": {
-            "contents": "read",
-            "id-token": "write",
-            "pages": "write",
+            "contents": "write",
         },
         "concurrency": {
             "group": "daily-signal-bot-${{ github.ref }}",
@@ -44,7 +42,10 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
                 "type": "boolean",
             },
         },
-        "runtime_env_keys": ["MARKET", "DRY_RUN"],
+        "cli": {
+            "market_env": "MARKET",
+            "dry_run_env": "DRY_RUN",
+        },
         "secret_env": {
             "TELEGRAM_BOT_TOKEN": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
             "TELEGRAM_CHAT_ID": "${{ secrets.TELEGRAM_CHAT_ID }}",
@@ -54,8 +55,9 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
             "paths": ["artifacts", "data/prices"],
         },
         "pages": {
+            "enabled": True,
             "public_dir": "public",
-            "environment_name": "github-pages",
+            "publish_branch": "gh-pages",
             "bundle_files": [
                 {"source": "artifacts/report.html", "target": "public/index.html"},
                 {"source": "artifacts/report.json", "target": "public/report.json"},
@@ -75,9 +77,7 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
         "file": ".github/workflows/manual.yml",
         "name": "Manual Signal Bot Test",
         "permissions": {
-            "contents": "read",
-            "id-token": "write",
-            "pages": "write",
+            "contents": "write",
         },
         "dispatch_inputs": {
             "symbol": {
@@ -107,7 +107,12 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
                 "type": "boolean",
             },
         },
-        "runtime_env_keys": ["SYMBOL", "GROUP", "MARKET", "DRY_RUN"],
+        "cli": {
+            "symbol_env": "SYMBOL",
+            "group_env": "GROUP",
+            "market_env": "MARKET",
+            "dry_run_env": "DRY_RUN",
+        },
         "secret_env": {
             "TELEGRAM_BOT_TOKEN": "${{ secrets.TELEGRAM_BOT_TOKEN }}",
             "TELEGRAM_CHAT_ID": "${{ secrets.TELEGRAM_CHAT_ID }}",
@@ -117,10 +122,10 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
             "paths": ["artifacts"],
         },
         "pages": {
+            "enabled": True,
             "public_dir": "public",
-            "environment_name": "github-pages",
+            "publish_branch": "gh-pages",
             "prepare_condition": "${{ github.event.inputs.publish_pages == 'true' }}",
-            "upload_condition": "${{ github.event.inputs.publish_pages == 'true' }}",
             "deploy_condition": "${{ github.event.inputs.publish_pages == 'true' }}",
             "bundle_files": [
                 {"source": "artifacts/report.html", "target": "public/index.html"},
@@ -188,8 +193,6 @@ def render_workflow(*, workflow: dict[str, Any]) -> str:
     lines.append("")
     lines.append("jobs:")
     lines.extend(_render_build_job(workflow=workflow))
-    if workflow.get("pages", {}).get("enabled"):
-        lines.extend(_render_deploy_job(workflow=workflow))
     return "\n".join(lines).rstrip() + "\n"
 
 
@@ -255,7 +258,7 @@ def _render_build_job(*, workflow: dict[str, Any]) -> list[str]:
     lines.extend(_render_run_step(workflow=workflow))
     lines.extend(_render_pages_prepare_step(workflow=workflow))
     lines.extend(_render_runtime_artifact_step(workflow=workflow))
-    lines.extend(_render_pages_upload_step(workflow=workflow))
+    lines.extend(_render_pages_deploy_step(workflow=workflow))
     return lines
 
 
@@ -333,6 +336,7 @@ def _render_pages_prepare_step(*, workflow: dict[str, Any]) -> list[str]:
     )
     for bundle in pages.get("bundle_files", []):
         lines.append(f"          cp {bundle['source']} {bundle['target']}")
+    lines.append(f"          touch {public_dir}/.nojekyll")
     lines.append("")
     return lines
 
@@ -352,41 +356,27 @@ def _render_runtime_artifact_step(*, workflow: dict[str, Any]) -> list[str]:
     return lines
 
 
-def _render_pages_upload_step(*, workflow: dict[str, Any]) -> list[str]:
+def _render_pages_deploy_step(*, workflow: dict[str, Any]) -> list[str]:
     pages = workflow.get("pages", {})
     if not pages.get("enabled"):
         return []
 
-    lines = ['      - name: "Upload pages artifact"']
-    if pages.get("upload_condition"):
-        lines.append(f"        if: {pages['upload_condition']}")
+    lines = ['      - name: "Deploy to gh-pages branch"']
+    if pages.get("deploy_condition"):
+        lines.append(f"        if: {pages['deploy_condition']}")
     lines.extend(
         [
-            '        uses: "actions/upload-pages-artifact@v3"',
+            '        uses: "peaceiris/actions-gh-pages@v4"',
             "        with:",
-            f'          path: "{pages["public_dir"]}"',
+            '          github_token: "${{ secrets.GITHUB_TOKEN }}"',
+            f'          publish_branch: "{pages["publish_branch"]}"',
+            f'          publish_dir: "{pages["public_dir"]}"',
+            "          force_orphan: true",
+            "          enable_jekyll: false",
             "",
         ]
     )
     return lines
-
-
-def _render_deploy_job(*, workflow: dict[str, Any]) -> list[str]:
-    deploy_condition = workflow["pages"]["deploy_condition"]
-    environment_name = workflow["pages"]["environment_name"]
-    return [
-        "  deploy:",
-        "    needs: build",
-        f"    if: {deploy_condition}",
-        "    environment:",
-        f'      name: "{environment_name}"',
-        '      url: "${{ steps.deployment.outputs.page_url }}"',
-        '    runs-on: "ubuntu-latest"',
-        "    steps:",
-        '      - name: "Deploy to GitHub Pages"',
-        "        id: deployment",
-        '        uses: "actions/deploy-pages@v4"',
-    ]
 
 
 def _build_daily_workflow(config: dict[str, Any]) -> dict[str, Any]:

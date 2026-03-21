@@ -112,6 +112,7 @@ Important:
 - Because of that, this project uses [`config/github_actions.yml`](./config/github_actions.yml) as the source of truth and keeps [`.github/workflows/`](./.github/workflows/) YAML files as generated outputs.
 - This file is intentionally limited to user-facing customization values such as cron entries and workflow option defaults.
 - Developer-facing values such as runner type, permissions, artifact paths, and Python/uv versions are kept inside the generator as internal defaults.
+- The workflow builds a `public/` bundle and pushes it to the dedicated `gh-pages` branch for GitHub Pages hosting.
 - After changing the config, regenerate the workflow files.
 
 ```bash

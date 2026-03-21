@@ -36,9 +36,7 @@ on:
         type: "boolean"
 
 permissions:
-  contents: "read"
-  id-token: "write"
-  pages: "write"
+  contents: "write"
 
 jobs:
   build:
@@ -72,7 +70,27 @@ jobs:
         run: |
           set -euo pipefail
           cmd=(uv run python -m watchlist_signal_bot.main)
+          if [[ "${MARKET}" != "" && "${MARKET}" != "ALL" ]]; then
+            cmd+=(--market "${MARKET}")
+          fi
+          if [[ -n "${GROUP}" ]]; then
+            cmd+=(--group "${GROUP}")
+          fi
+          if [[ -n "${SYMBOL}" ]]; then
+            cmd+=(--symbol "${SYMBOL}")
+          fi
+          if [[ "${DRY_RUN}" == "true" || -z "${TELEGRAM_BOT_TOKEN}" || -z "${TELEGRAM_CHAT_ID}" ]]; then
+            cmd+=(--dry-run)
+          fi
           "${cmd[@]}"
+
+      - name: "Prepare Pages bundle"
+        if: ${{ github.event.inputs.publish_pages == 'true' }}
+        run: |
+          mkdir -p public
+          cp artifacts/report.html public/index.html
+          cp artifacts/report.json public/report.json
+          touch public/.nojekyll
 
       - name: "Upload runtime artifacts"
         uses: "actions/upload-artifact@v4"
@@ -80,3 +98,13 @@ jobs:
           name: "manual-signal-bot-artifacts"
           path: |
             artifacts
+
+      - name: "Deploy to gh-pages branch"
+        if: ${{ github.event.inputs.publish_pages == 'true' }}
+        uses: "peaceiris/actions-gh-pages@v4"
+        with:
+          github_token: "${{ secrets.GITHUB_TOKEN }}"
+          publish_branch: "gh-pages"
+          publish_dir: "public"
+          force_orphan: true
+          enable_jekyll: false

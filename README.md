@@ -112,6 +112,7 @@ GitHub Actions 관련 설정을 관리합니다.
 - 그래서 이 프로젝트는 [`config/github_actions.yml`](./config/github_actions.yml)을 소스로 사용하고, [`.github/workflows/`](./.github/workflows/) 아래 YAML은 생성물로 관리합니다.
 - 이 파일에는 사용자가 바꿔도 되는 값만 둡니다. 예를 들어 `cron`, `market 기본값`, `dry_run 기본값`, `publish_pages 기본값` 같은 항목입니다.
 - runner, permissions, artifact 경로, Python/uv 버전 같은 개발자용 값은 생성기 내부 기본값으로 관리합니다.
+- 리포트 HTML은 workflow가 `public/` 번들을 만든 뒤 `gh-pages` 전용 브랜치로 푸시합니다.
 - 설정 변경 후 아래 명령으로 워크플로를 다시 생성해야 합니다.
 
 ```bash
