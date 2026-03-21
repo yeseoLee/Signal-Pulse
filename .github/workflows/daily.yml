@@ -22,7 +22,7 @@ on:
       dry_run:
         description: "Skip Telegram delivery"
         required: false
-        default: true
+        default: false
         type: "boolean"
       publish_pages:
         description: "Deploy HTML report to GitHub Pages"
@@ -69,21 +69,7 @@ jobs:
         run: |
           set -euo pipefail
           cmd=(uv run python -m watchlist_signal_bot.main)
-          if [[ "${MARKET}" != "" && "${MARKET}" != "ALL" ]]; then
-            cmd+=(--market "${MARKET}")
-          fi
-          if [[ "${DRY_RUN}" == "true" || -z "${TELEGRAM_BOT_TOKEN}" || -z "${TELEGRAM_CHAT_ID}" ]]; then
-            cmd+=(--dry-run)
-          fi
           "${cmd[@]}"
-
-      - name: "Prepare Pages bundle"
-        run: |
-          mkdir -p public
-          cp artifacts/report.html public/index.html
-          cp artifacts/report.json public/report.json
-          cp artifacts/signals_daily.csv public/signals_daily.csv
-          cp artifacts/signal_history.csv public/signal_history.csv
 
       - name: "Upload runtime artifacts"
         uses: "actions/upload-artifact@v4"
@@ -92,20 +78,3 @@ jobs:
           path: |
             artifacts
             data/prices
-
-      - name: "Upload pages artifact"
-        uses: "actions/upload-pages-artifact@v3"
-        with:
-          path: "public"
-
-  deploy:
-    needs: build
-    if: ${{ github.event_name == 'schedule' || github.event.inputs.publish_pages != 'false' }}
-    environment:
-      name: "github-pages"
-      url: "${{ steps.deployment.outputs.page_url }}"
-    runs-on: "ubuntu-latest"
-    steps:
-      - name: "Deploy to GitHub Pages"
-        id: deployment
-        uses: "actions/deploy-pages@v4"

@@ -72,26 +72,7 @@ jobs:
         run: |
           set -euo pipefail
           cmd=(uv run python -m watchlist_signal_bot.main)
-          if [[ "${MARKET}" != "" && "${MARKET}" != "ALL" ]]; then
-            cmd+=(--market "${MARKET}")
-          fi
-          if [[ -n "${GROUP}" ]]; then
-            cmd+=(--group "${GROUP}")
-          fi
-          if [[ -n "${SYMBOL}" ]]; then
-            cmd+=(--symbol "${SYMBOL}")
-          fi
-          if [[ "${DRY_RUN}" == "true" || -z "${TELEGRAM_BOT_TOKEN}" || -z "${TELEGRAM_CHAT_ID}" ]]; then
-            cmd+=(--dry-run)
-          fi
           "${cmd[@]}"
-
-      - name: "Prepare Pages bundle"
-        if: ${{ github.event.inputs.publish_pages == 'true' }}
-        run: |
-          mkdir -p public
-          cp artifacts/report.html public/index.html
-          cp artifacts/report.json public/report.json
 
       - name: "Upload runtime artifacts"
         uses: "actions/upload-artifact@v4"
@@ -99,21 +80,3 @@ jobs:
           name: "manual-signal-bot-artifacts"
           path: |
             artifacts
-
-      - name: "Upload pages artifact"
-        if: ${{ github.event.inputs.publish_pages == 'true' }}
-        uses: "actions/upload-pages-artifact@v3"
-        with:
-          path: "public"
-
-  deploy:
-    needs: build
-    if: ${{ github.event.inputs.publish_pages == 'true' }}
-    environment:
-      name: "github-pages"
-      url: "${{ steps.deployment.outputs.page_url }}"
-    runs-on: "ubuntu-latest"
-    steps:
-      - name: "Deploy to GitHub Pages"
-        id: deployment
-        uses: "actions/deploy-pages@v4"

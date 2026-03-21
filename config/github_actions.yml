@@ -1,126 +1,28 @@
-shared:
-  python_version: "3.12"
-  uv_version: "0.6.11"
-  runs_on: ubuntu-latest
-  command_module: watchlist_signal_bot.main
-  install_command: uv sync --group dev
-  permissions:
-    contents: read
-    id-token: write
-    pages: write
-  secret_env:
-    TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-    TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-  pages:
-    public_dir: public
-    environment_name: github-pages
+daily:
+  schedule:
+    - "35 7 * * 1-5"
+    - "35 22 * * 1-5"
+  options:
+    market:
+      default: ALL
+      choices:
+        - ALL
+        - KR
+        - US
+    dry_run:
+      default: false
+    publish_pages:
+      default: true
 
-workflows:
-  daily:
-    file: .github/workflows/daily.yml
-    name: Daily Signal Bot
-    schedule:
-      - "35 7 * * 1-5"
-      - "35 22 * * 1-5"
-    dispatch_inputs:
-      market:
-        description: Optional market filter
-        required: false
-        default: ALL
-        type: choice
-        options:
-          - ALL
-          - KR
-          - US
-      dry_run:
-        description: Skip Telegram delivery
-        required: false
-        default: true
-        type: boolean
-      publish_pages:
-        description: Deploy HTML report to GitHub Pages
-        required: false
-        default: true
-        type: boolean
-    concurrency:
-      group: daily-signal-bot-${{ github.ref }}
-      cancel-in-progress: false
-    env:
-      MARKET: ${{ github.event.inputs.market || 'ALL' }}
-      DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
-    cli:
-      market_env: MARKET
-      dry_run_env: DRY_RUN
-    runtime_artifact:
-      name: signal-bot-artifacts
-      paths:
-        - artifacts
-        - data/prices
-    pages:
-      enabled: true
-      bundle_files:
-        - source: artifacts/report.html
-          target: public/index.html
-        - source: artifacts/report.json
-          target: public/report.json
-        - source: artifacts/signals_daily.csv
-          target: public/signals_daily.csv
-        - source: artifacts/signal_history.csv
-          target: public/signal_history.csv
-      deploy_condition: ${{ github.event_name == 'schedule' || github.event.inputs.publish_pages != 'false' }}
-
-  manual:
-    file: .github/workflows/manual.yml
-    name: Manual Signal Bot Test
-    dispatch_inputs:
-      symbol:
-        description: Optional single symbol filter
-        required: false
-        type: string
-      group:
-        description: Optional group filter
-        required: false
-        type: string
-      market:
-        description: Optional market filter
-        required: false
-        default: ALL
-        type: choice
-        options:
-          - ALL
-          - KR
-          - US
-      dry_run:
-        description: Skip Telegram delivery
-        required: false
-        default: true
-        type: boolean
-      publish_pages:
-        description: Deploy generated report to GitHub Pages
-        required: false
-        default: false
-        type: boolean
-    env:
-      SYMBOL: ${{ github.event.inputs.symbol }}
-      GROUP: ${{ github.event.inputs.group }}
-      MARKET: ${{ github.event.inputs.market || 'ALL' }}
-      DRY_RUN: ${{ github.event.inputs.dry_run || 'true' }}
-    cli:
-      symbol_env: SYMBOL
-      group_env: GROUP
-      market_env: MARKET
-      dry_run_env: DRY_RUN
-    runtime_artifact:
-      name: manual-signal-bot-artifacts
-      paths:
-        - artifacts
-    pages:
-      enabled: true
-      prepare_condition: ${{ github.event.inputs.publish_pages == 'true' }}
-      upload_condition: ${{ github.event.inputs.publish_pages == 'true' }}
-      deploy_condition: ${{ github.event.inputs.publish_pages == 'true' }}
-      bundle_files:
-        - source: artifacts/report.html
-          target: public/index.html
-        - source: artifacts/report.json
-          target: public/report.json
+manual:
+  options:
+    market:
+      default: ALL
+      choices:
+        - ALL
+        - KR
+        - US
+    dry_run:
+      default: true
+    publish_pages:
+      default: false
