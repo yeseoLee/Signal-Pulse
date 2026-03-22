@@ -23,7 +23,7 @@ logger = get_logger(__name__)
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="My Watchlist Signal Bot")
+    parser = argparse.ArgumentParser(description="시그널 봇")
     parser.add_argument("--root-dir", default=".", help="Project root directory")
     parser.add_argument("--watchlist", help="Path to watchlist.yml")
     parser.add_argument("--thresholds", help="Path to thresholds.yml")

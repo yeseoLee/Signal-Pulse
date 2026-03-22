@@ -1,4 +1,4 @@
-"""My Watchlist Signal Bot."""
+"""시그널 봇."""
 
 __all__ = ["__version__"]
 

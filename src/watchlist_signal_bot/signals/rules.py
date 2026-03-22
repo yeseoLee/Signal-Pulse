@@ -67,7 +67,7 @@ def evaluate_signals(
             _event(
                 "BREAKOUT_60D",
                 "positive",
-                "Breakout 60D",
+                "60일 돌파",
                 20,
                 "종가가 직전 60일 고점을 상향 돌파했습니다.",
             )
@@ -77,7 +77,7 @@ def evaluate_signals(
             _event(
                 "BREAKOUT_20D",
                 "positive",
-                "Breakout 20D",
+                "20일 돌파",
                 10,
                 "종가가 직전 20일 고점을 상향 돌파했습니다.",
             )
@@ -88,7 +88,7 @@ def evaluate_signals(
             _event(
                 "GOLDEN_CROSS",
                 "positive",
-                "Golden Cross",
+                "골든크로스",
                 15,
                 "SMA20이 SMA60을 상향 돌파했습니다.",
             )
@@ -99,7 +99,7 @@ def evaluate_signals(
             _event(
                 "RS_GT_BENCHMARK",
                 "positive",
-                "Relative Strength Positive",
+                "상대강도 우위",
                 15,
                 "60일 상대강도가 벤치마크보다 우위입니다.",
             )
@@ -110,7 +110,7 @@ def evaluate_signals(
             _event(
                 "MOMENTUM_ACCELERATING",
                 "positive",
-                "Momentum Accelerating",
+                "모멘텀 가속",
                 10,
                 "20일 수익률이 최근 60일 흐름 대비 가속 중입니다.",
             )
@@ -122,7 +122,7 @@ def evaluate_signals(
                 _event(
                     "VOLUME_CONFIRMED_BREAKOUT",
                     "positive",
-                    "Volume Confirmed Breakout",
+                    "거래량 동반 돌파",
                     10,
                     f"거래량이 20일 평균 대비 {latest['volume_ratio_20']:.1f}배입니다.",
                 )
@@ -135,7 +135,7 @@ def evaluate_signals(
                 _event(
                     "WATCH_NEAR_BREAKOUT",
                     "neutral",
-                    "Watch Near Breakout",
+                    "돌파 임박",
                     6,
                     "20일 고점 근처까지 접근했습니다.",
                 )
@@ -146,7 +146,7 @@ def evaluate_signals(
             _event(
                 "RANGE_COMPRESSION",
                 "neutral",
-                "Range Compression",
+                "박스 압축",
                 5,
                 "볼린저 밴드 폭이 축소되어 방향성 대기 구간입니다.",
             )
@@ -162,7 +162,7 @@ def evaluate_signals(
             _event(
                 "PULLBACK_IN_UPTREND",
                 "neutral",
-                "Pullback In Uptrend",
+                "상승 추세 눌림",
                 7,
                 "상승 추세 안에서 단기 눌림 구간입니다.",
             )
@@ -173,7 +173,7 @@ def evaluate_signals(
             _event(
                 "DEAD_CROSS",
                 "negative",
-                "Dead Cross",
+                "데드크로스",
                 -20,
                 "SMA20이 SMA60 아래로 내려왔습니다.",
             )
@@ -184,7 +184,7 @@ def evaluate_signals(
             _event(
                 "BREAKDOWN_20D",
                 "negative",
-                "Breakdown 20D",
+                "20일 이탈",
                 -15,
                 "종가가 직전 20일 저점을 이탈했습니다.",
             )
@@ -198,7 +198,7 @@ def evaluate_signals(
             _event(
                 "HIGH_VOLUME_SELLING",
                 "negative",
-                "High Volume Selling",
+                "거래량 동반 하락",
                 -10,
                 f"하락과 함께 거래량이 {latest['volume_ratio_20']:.1f}배로 증가했습니다.",
             )
@@ -209,7 +209,7 @@ def evaluate_signals(
             _event(
                 "RS_WEAKENING",
                 "negative",
-                "RS Weakening",
+                "상대강도 약화",
                 -10,
                 "상대강도 비율이 약해지고 있습니다.",
             )
@@ -220,7 +220,7 @@ def evaluate_signals(
             _event(
                 "CLOSE_BELOW_SMA120",
                 "negative",
-                "Close Below SMA120",
+                "장기선 하회",
                 -10,
                 "종가가 장기 이동평균 아래에 있습니다.",
             )
@@ -231,7 +231,7 @@ def evaluate_signals(
             _event(
                 "RSI_OVERHEATED",
                 "negative",
-                "RSI Overheated",
+                "RSI 과열",
                 -5,
                 f"RSI가 {latest['rsi_14']:.1f}로 과열권입니다.",
             )

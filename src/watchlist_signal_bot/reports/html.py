@@ -8,6 +8,56 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 from watchlist_signal_bot.models import AnalysisResult, Event
 
+STATE_LABELS = {
+    "Strong Uptrend": "강한 상승 추세",
+    "Uptrend": "상승 추세",
+    "Neutral": "중립",
+    "Weak": "약세",
+    "Breakdown Risk": "하락 위험",
+}
+
+QUALITY_LABELS = {
+    "fresh": "신규 수집",
+    "fallback": "대체 소스",
+    "stale": "캐시 재사용",
+    "partial": "부분 성공",
+}
+
+CONFIDENCE_LABELS = {
+    "High": "높음",
+    "Medium": "보통",
+    "Low": "낮음",
+}
+
+MARKET_LABELS = {
+    "KR": "한국",
+    "US": "미국",
+}
+
+GROUP_LABELS = {
+    "core_kr": "한국 핵심",
+    "core_us": "미국 핵심",
+    "benchmarks": "벤치마크",
+}
+
+EVENT_LABELS = {
+    "BREAKOUT_20D": "20일 돌파",
+    "BREAKOUT_60D": "60일 돌파",
+    "GOLDEN_CROSS": "골든크로스",
+    "RS_GT_BENCHMARK": "상대강도 우위",
+    "VOLUME_CONFIRMED_BREAKOUT": "거래량 동반 돌파",
+    "MOMENTUM_ACCELERATING": "모멘텀 가속",
+    "WATCH_NEAR_BREAKOUT": "돌파 임박",
+    "RANGE_COMPRESSION": "박스 압축",
+    "PULLBACK_IN_UPTREND": "상승 추세 눌림",
+    "DEAD_CROSS": "데드크로스",
+    "BREAKDOWN_20D": "20일 이탈",
+    "HIGH_VOLUME_SELLING": "거래량 동반 하락",
+    "RS_WEAKENING": "상대강도 약화",
+    "CLOSE_BELOW_SMA120": "장기선 하회",
+    "RSI_OVERHEATED": "RSI 과열",
+}
+
 
 def render_html_report(
     results: list[AnalysisResult],
@@ -20,8 +70,12 @@ def render_html_report(
     latest_date = max(item.as_of for item in ordered).isoformat()
     groups = _group_summary(ordered)
     history_latest = history_frame[history_frame["as_of"] == latest_date].copy()
-    new_signal_rows = history_latest[history_latest["new_events"].fillna("") != ""].to_dict(
-        "records"
+    if not history_latest.empty:
+        history_latest["new_events_label"] = history_latest["new_events"].map(_localize_event_codes)
+    new_signal_rows = (
+        history_latest[history_latest["new_events"].fillna("") != ""]
+        .sort_values(by=["score", "symbol"], ascending=[False, True])
+        .to_dict("records")
     )
     environment = Environment(
         loader=FileSystemLoader(str(Path(__file__).parent / "templates")),
@@ -71,6 +125,7 @@ def _group_summary(results: list[AnalysisResult]) -> list[dict[str, str | int | 
                 "bearish": sum(
                     1 for item in items if any(event.weight < 0 for event in item.display_events)
                 ),
+                "group_label": _group_label(group),
             }
         )
     return summary
@@ -81,24 +136,27 @@ def _to_card(result: AnalysisResult) -> dict[str, object]:
     return {
         "symbol": result.config.symbol,
         "name": result.config.name,
-        "market": result.config.market,
-        "group": result.config.group,
-        "state": result.state,
+        "market": _market_label(result.config.market),
+        "group": _group_label(result.config.group),
+        "state": _state_label(result.state),
         "score": result.score,
-        "confidence": result.confidence,
-        "source": result.source,
-        "data_quality": result.data_quality,
+        "confidence": _confidence_label(result.confidence),
+        "source": _source_label(result.source),
+        "data_quality": _quality_label(result.data_quality),
         "benchmark": result.config.benchmark_label or result.config.benchmark or "-",
         "price": f"{result.price:,.2f}",
         "events": [_event_to_dict(event) for event in result.display_events],
         "sparkline_points": _sparkline_points(result.sparkline),
         "metrics": [
-            {"label": "20D", "value": _fmt_percent(indicators.get("return_20d"))},
-            {"label": "60D", "value": _fmt_percent(indicators.get("return_60d"))},
-            {"label": "120D", "value": _fmt_percent(indicators.get("return_120d"))},
-            {"label": "RS 60D", "value": _fmt_percent(indicators.get("relative_return_60d"))},
+            {"label": "20일", "value": _fmt_percent(indicators.get("return_20d"))},
+            {"label": "60일", "value": _fmt_percent(indicators.get("return_60d"))},
+            {"label": "120일", "value": _fmt_percent(indicators.get("return_120d"))},
+            {
+                "label": "상대강도 60일",
+                "value": _fmt_percent(indicators.get("relative_return_60d")),
+            },
             {"label": "RSI14", "value": _fmt_number(indicators.get("rsi14"))},
-            {"label": "Vol x", "value": _fmt_number(indicators.get("volume_ratio_20"))},
+            {"label": "거래량 배수", "value": _fmt_number(indicators.get("volume_ratio_20"))},
         ],
     }
 
@@ -133,6 +191,7 @@ def _event_to_dict(event: Event) -> dict[str, str]:
     return {
         "title": event.title,
         "code": event.code,
+        "label": _event_label(event.code),
         "detail": event.detail,
         "class_name": f"badge-{event.polarity}",
     }
@@ -144,3 +203,38 @@ def _has_event(result: AnalysisResult, code: str) -> bool:
 
 def _has_negative(result: AnalysisResult) -> bool:
     return any(event.weight < 0 for event in result.display_events)
+
+
+def _event_label(code: str) -> str:
+    return EVENT_LABELS.get(code, code)
+
+
+def _localize_event_codes(raw_codes: str) -> str:
+    codes = [code for code in str(raw_codes).split(";") if code]
+    return ", ".join(_event_label(code) for code in codes)
+
+
+def _state_label(state: str) -> str:
+    return STATE_LABELS.get(state, state)
+
+
+def _quality_label(quality: str) -> str:
+    return QUALITY_LABELS.get(quality, quality)
+
+
+def _confidence_label(confidence: str) -> str:
+    return CONFIDENCE_LABELS.get(confidence, confidence)
+
+
+def _market_label(market: str) -> str:
+    return MARKET_LABELS.get(market, market)
+
+
+def _group_label(group: str) -> str:
+    return GROUP_LABELS.get(group, group.replace("_", " "))
+
+
+def _source_label(source: str) -> str:
+    if source == "cache":
+        return "캐시"
+    return source

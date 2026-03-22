@@ -12,7 +12,7 @@ A rule-based signal bot that collects OHLCV data for KR/US stocks and ETFs, calc
 - Collects daily OHLCV data for a user-managed watchlist.
 - Computes explainable signals based on moving averages, breakouts, RSI, volume, and relative strength.
 - Writes outputs as `CSV`, `JSON`, `HTML`, and `Telegram text`.
-- Prefers fallback data sources and cached prices when live fetches fail.
+- Uses `FinanceDataReader` as the unified price source and falls back to cached prices when live fetches fail.
 
 ## Quick Start
 
@@ -73,6 +73,8 @@ Defines signal calculation parameters.
 - volume spike threshold: `volume.spike_ratio`
 - RSI period and bounds: `rsi`
 - scoring weights: `score_weights`
+
+The default market-data source is `FinanceDataReader`.
 
 ### `config/benchmarks.yml`
 
@@ -172,6 +174,7 @@ This category measures whether upside speed and mid-term momentum are still impr
 - The output is split into `[강세]`, `[중립]`, and `[약세]` sections.
 - Each symbol is described with separate natural-language lines for moving averages, breakouts, RSI, volume, relative strength, and momentum.
 - Example: `Price is below the 120-day moving average.`, `A dead cross occurred.`, `RSI is 41.2.`
+- Fetch-status labels such as `fresh`, `fallback`, and `stale` are not shown in Telegram.
 - The default watchlist contains 9 symbols: US M6 plus 3 KR large caps.
 
 ## Environment Variables
