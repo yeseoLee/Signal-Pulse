@@ -14,6 +14,16 @@ A rule-based signal bot that collects OHLCV data for KR/US stocks and ETFs, calc
 - Writes outputs as `CSV`, `JSON`, `HTML`, and `Telegram text`.
 - Uses `FinanceDataReader` as the unified price source and falls back to cached prices when live fetches fail.
 
+## Fork Setup
+
+If you want to run this from your own fork, set up these items first.
+
+1. Update [`config/watchlist.yml`](./config/watchlist.yml) with your own symbols.
+2. Update [`config/github_actions.yml`](./config/github_actions.yml) for your schedule and workflow defaults.
+3. Add `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` under `Settings > Secrets and variables > Actions`.
+4. In `Settings > Pages`, set GitHub Pages to use the `gh-pages` branch and `/ (root)`.
+5. If needed, set `GITHUB_PAGES_URL` to pin the report link shown in Telegram.
+
 ## Quick Start
 
 ```bash

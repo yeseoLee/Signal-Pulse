@@ -14,6 +14,16 @@
 - 결과를 `CSV`, `JSON`, `HTML`, `Telegram text` 형태로 저장합니다.
 - 가격 데이터는 `FinanceDataReader`로 수집하고, 실패 시 저장된 캐시를 재사용합니다.
 
+## Fork 후 설정
+
+이 저장소를 Fork해서 쓰려면 아래만 먼저 맞추면 됩니다.
+
+1. [`config/watchlist.yml`](./config/watchlist.yml)에서 관심종목을 본인 기준으로 수정합니다.
+2. [`config/github_actions.yml`](./config/github_actions.yml)에서 실행 주기와 기본 옵션을 수정합니다.
+3. GitHub 저장소 `Settings > Secrets and variables > Actions`에 `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`를 등록합니다.
+4. GitHub 저장소 `Settings > Pages`에서 `gh-pages` 브랜치 `/ (root)`를 Pages 소스로 지정합니다.
+5. 필요하면 `GITHUB_PAGES_URL` 환경변수에 본인 Pages 주소를 넣어 텔레그램 링크를 고정할 수 있습니다.
+
 ## 빠른 시작
 
 ```bash
