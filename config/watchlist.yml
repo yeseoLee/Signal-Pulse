@@ -10,13 +10,6 @@ groups:
     - AMZN
     - META
     - GOOGL
-    - TSLA
-  etf_us:
-    - QQQ
-    - SPY
-  etf_kr:
-    - "069500"
-    - "229200"
 
 metadata:
   "005930":
@@ -64,28 +57,3 @@ metadata:
     name: Alphabet Class A
     benchmark: QQQ
     asset_type: equity
-  TSLA:
-    market: US
-    name: Tesla
-    benchmark: QQQ
-    asset_type: equity
-  SPY:
-    market: US
-    name: SPDR S&P 500 ETF
-    benchmark: SPY
-    asset_type: etf
-  QQQ:
-    market: US
-    name: Invesco QQQ
-    benchmark: SPY
-    asset_type: etf
-  "069500":
-    market: KR
-    name: KODEX 200
-    benchmark: KOSPI
-    asset_type: etf
-  "229200":
-    market: KR
-    name: KODEX 코스닥150
-    benchmark: KOSDAQ
-    asset_type: etf

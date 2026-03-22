@@ -43,10 +43,8 @@ Defines the watchlist universe and per-symbol metadata.
 
 Current default universe:
 
-- US mega caps: `AAPL`, `MSFT`, `NVDA`, `AMZN`, `META`, `GOOGL`, `TSLA`
-- US ETFs: `QQQ`, `SPY`
+- US M6: `AAPL`, `MSFT`, `NVDA`, `AMZN`, `META`, `GOOGL`
 - KR large caps: `"005930"` Samsung Electronics, `"000660"` SK hynix, `"005380"` Hyundai Motor
-- KR ETFs: `"069500"` KODEX 200, `"229200"` KODEX KOSDAQ150
 
 Example:
 
@@ -63,13 +61,6 @@ groups:
     - AMZN
     - META
     - GOOGL
-    - TSLA
-  etf_us:
-    - QQQ
-    - SPY
-  etf_kr:
-    - "069500"
-    - "229200"
 ```
 
 ### `config/thresholds.yml`
@@ -122,7 +113,7 @@ make check-workflows
 
 ## Signal Components
 
-The Telegram summary no longer relies on only one total score. It also uses per-indicator scores for the categories below.
+The Telegram summary no longer relies on one combined score line. Instead, it renders each category below as natural-language explanations per symbol.
 
 ### Moving Average
 
@@ -178,10 +169,10 @@ This category measures whether upside speed and mid-term momentum are still impr
 
 ### How To Read Telegram Output
 
-- `Top Bullish` is sorted by the sum of positive per-indicator scores.
-- `Top Risk` is sorted by the sum of negative per-indicator scores.
-- The `indicator scores` line is shown in this order:
-  `moving average / breakout / RSI / volume / relative strength / momentum`.
+- The output is split into `[강세]`, `[중립]`, and `[약세]` sections.
+- Each symbol is described with separate natural-language lines for moving averages, breakouts, RSI, volume, relative strength, and momentum.
+- Example: `Price is below the 120-day moving average.`, `A dead cross occurred.`, `RSI is 41.2.`
+- The default watchlist contains 9 symbols: US M6 plus 3 KR large caps.
 
 ## Environment Variables
 
