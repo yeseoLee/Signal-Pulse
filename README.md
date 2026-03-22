@@ -1,4 +1,4 @@
-# 시그널 봇
+# Watchlist Signal Bot
 
 ## Language
 
