@@ -30,30 +30,30 @@ metadata:
   AAPL:
     market: US
     name: Apple
-    benchmark: QQQ
+    benchmark: SPY
     asset_type: equity
   MSFT:
     market: US
     name: Microsoft
-    benchmark: QQQ
+    benchmark: SPY
     asset_type: equity
   NVDA:
     market: US
     name: NVIDIA
-    benchmark: SOXX
+    benchmark: SPY
     asset_type: equity
   AMZN:
     market: US
     name: Amazon
-    benchmark: QQQ
+    benchmark: SPY
     asset_type: equity
   META:
     market: US
     name: Meta Platforms
-    benchmark: QQQ
+    benchmark: SPY
     asset_type: equity
   GOOGL:
     market: US
     name: Alphabet Class A
-    benchmark: QQQ
+    benchmark: SPY
     asset_type: equity

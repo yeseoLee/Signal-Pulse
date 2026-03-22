@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -26,6 +27,7 @@ class AppSettings:
     lookback_days: int = 420
     telegram_bot_token: str | None = None
     telegram_chat_id: str | None = None
+    github_pages_url: str | None = None
 
     @classmethod
     def build(
@@ -64,6 +66,7 @@ class AppSettings:
             lookback_days=lookback_days,
             telegram_bot_token=os.getenv("TELEGRAM_BOT_TOKEN"),
             telegram_chat_id=os.getenv("TELEGRAM_CHAT_ID"),
+            github_pages_url=_resolve_github_pages_url(root_dir),
         )
 
     def ensure_directories(self) -> None:
@@ -82,3 +85,32 @@ def load_yaml_file(path: Path) -> dict[str, Any]:
     if not isinstance(data, dict):
         raise ValueError(f"YAML file must contain a mapping: {path}")
     return data
+
+
+def _resolve_github_pages_url(root_dir: Path) -> str | None:
+    env_url = os.getenv("GITHUB_PAGES_URL")
+    if env_url:
+        return env_url.rstrip("/") + "/"
+
+    try:
+        result = subprocess.run(
+            ["git", "remote", "get-url", "origin"],
+            cwd=root_dir,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except Exception:  # noqa: BLE001
+        return None
+
+    remote = result.stdout.strip()
+    if remote.startswith("git@github.com:"):
+        remote = remote.replace("git@github.com:", "https://github.com/")
+    if not remote.startswith("https://github.com/"):
+        return None
+
+    path = remote.removeprefix("https://github.com/").removesuffix(".git").strip("/")
+    if "/" not in path:
+        return None
+    owner, repo = path.split("/", 1)
+    return f"https://{owner.lower()}.github.io/{repo}/"

@@ -88,5 +88,8 @@ def test_html_report_renders_korean_labels():
     assert "오늘 새로 발생한 신호" in html
     assert "60일 돌파, 상대강도 우위" in html
     assert "강한 상승 추세" in html
-    assert "신뢰도 높음" in html
-    assert "가격 70,000.00 | FinanceDataReader | 신규 수집" in html
+    assert "가격 70,000.00" in html
+    assert "신뢰도 높음" not in html
+    assert "FinanceDataReader" not in html
+    assert "신규 수집" not in html
+    assert "벤치마크 KOSPI" not in html

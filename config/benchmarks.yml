@@ -16,7 +16,7 @@ symbols:
   SPY:
     symbol: SPY
     market: US
-    name: SPDR S&P 500 ETF
+    name: S&P500
     asset_type: etf
   QQQ:
     symbol: QQQ

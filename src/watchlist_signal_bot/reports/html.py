@@ -16,19 +16,6 @@ STATE_LABELS = {
     "Breakdown Risk": "하락 위험",
 }
 
-QUALITY_LABELS = {
-    "fresh": "신규 수집",
-    "fallback": "대체 소스",
-    "stale": "캐시 재사용",
-    "partial": "부분 성공",
-}
-
-CONFIDENCE_LABELS = {
-    "High": "높음",
-    "Medium": "보통",
-    "Low": "낮음",
-}
-
 MARKET_LABELS = {
     "KR": "한국",
     "US": "미국",
@@ -140,10 +127,6 @@ def _to_card(result: AnalysisResult) -> dict[str, object]:
         "group": _group_label(result.config.group),
         "state": _state_label(result.state),
         "score": result.score,
-        "confidence": _confidence_label(result.confidence),
-        "source": _source_label(result.source),
-        "data_quality": _quality_label(result.data_quality),
-        "benchmark": result.config.benchmark_label or result.config.benchmark or "-",
         "price": f"{result.price:,.2f}",
         "events": [_event_to_dict(event) for event in result.display_events],
         "sparkline_points": _sparkline_points(result.sparkline),
@@ -218,23 +201,9 @@ def _state_label(state: str) -> str:
     return STATE_LABELS.get(state, state)
 
 
-def _quality_label(quality: str) -> str:
-    return QUALITY_LABELS.get(quality, quality)
-
-
-def _confidence_label(confidence: str) -> str:
-    return CONFIDENCE_LABELS.get(confidence, confidence)
-
-
 def _market_label(market: str) -> str:
     return MARKET_LABELS.get(market, market)
 
 
 def _group_label(group: str) -> str:
     return GROUP_LABELS.get(group, group.replace("_", " "))
-
-
-def _source_label(source: str) -> str:
-    if source == "cache":
-        return "캐시"
-    return source

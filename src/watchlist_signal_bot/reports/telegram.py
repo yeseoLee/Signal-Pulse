@@ -15,6 +15,7 @@ def render_telegram_summary(
     *,
     failures: dict[str, str],
     benchmark_failures: dict[str, str],
+    github_pages_url: str | None = None,
 ) -> str:
     ordered = sorted(results, key=lambda item: item.config.symbol)
     bullish = _sort_bucket(
@@ -52,6 +53,8 @@ def render_telegram_summary(
             for index, result in enumerate(bucket, start=1):
                 lines.extend(_result_lines(index, result))
         lines.append("")
+    if github_pages_url:
+        lines.append(f"리포트: {github_pages_url}")
     return "\n".join(lines).rstrip()
 
 

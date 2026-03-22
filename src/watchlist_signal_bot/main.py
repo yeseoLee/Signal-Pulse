@@ -144,6 +144,7 @@ def main() -> int:
         analyses,
         failures=failures,
         benchmark_failures=benchmark_failures,
+        github_pages_url=settings.github_pages_url,
     )
     settings.telegram_path.write_text(telegram_text, encoding="utf-8")
 

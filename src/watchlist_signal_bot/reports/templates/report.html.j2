@@ -436,15 +436,14 @@
                 <div>
                   <strong>{{ card.symbol }}</strong>
                   <p>{{ card.name }}</p>
-                  <p class="subtle">{{ card.market }} | {{ card.group }} | 벤치마크 {{ card.benchmark }}</p>
+                  <p class="subtle">{{ card.market }} | {{ card.group }}</p>
                 </div>
                 <div class="score">
                   <strong>{{ card.score }}</strong>
                   <p class="subtle">{{ card.state }}</p>
-                  <p class="subtle">신뢰도 {{ card.confidence }}</p>
                 </div>
               </div>
-              <p class="subtle">가격 {{ card.price }} | {{ card.source }} | {{ card.data_quality }}</p>
+              <p class="subtle">가격 {{ card.price }}</p>
               <svg class="sparkline" viewBox="0 0 220 64" preserveAspectRatio="none">
                 <polyline points="{{ card.sparkline_points }}"></polyline>
               </svg>

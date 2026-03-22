@@ -180,6 +180,7 @@ def test_telegram_summary_renders_natural_language_sections():
         [bullish, neutral, bearish],
         failures={},
         benchmark_failures={},
+        github_pages_url="https://yeseolee.github.io/Signal-Pulse/",
     )
 
     assert "[시그널 봇]" in message
@@ -200,3 +201,4 @@ def test_telegram_summary_renders_natural_language_sections():
     assert "Score" not in message
     assert "신규수집" not in message
     assert "대체소스" not in message
+    assert "리포트: https://yeseolee.github.io/Signal-Pulse/" in message
