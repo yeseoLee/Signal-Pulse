@@ -126,8 +126,9 @@ def _to_card(result: AnalysisResult) -> dict[str, object]:
         "market": _market_label(result.config.market),
         "group": _group_label(result.config.group),
         "state": _state_label(result.state),
+        "state_class_name": _state_class_name(result.state),
         "score": result.score,
-        "price": f"{result.price:,.2f}",
+        "price": _format_price(result),
         "events": [_event_to_dict(event) for event in result.display_events],
         "sparkline_points": _sparkline_points(result.sparkline),
         "metrics": [
@@ -201,9 +202,25 @@ def _state_label(state: str) -> str:
     return STATE_LABELS.get(state, state)
 
 
+def _state_class_name(state: str) -> str:
+    if state in {"Strong Uptrend", "Uptrend"}:
+        return "badge-positive"
+    if state in {"Weak", "Breakdown Risk"}:
+        return "badge-negative"
+    return "badge-neutral"
+
+
 def _market_label(market: str) -> str:
     return MARKET_LABELS.get(market, market)
 
 
 def _group_label(group: str) -> str:
     return GROUP_LABELS.get(group, group.replace("_", " "))
+
+
+def _format_price(result: AnalysisResult) -> str:
+    if result.config.market == "KR":
+        return f"{result.price:,.0f}원"
+    if result.config.market == "US":
+        return f"${result.price:,.2f}"
+    return f"{result.price:,.2f}"

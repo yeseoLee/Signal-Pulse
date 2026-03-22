@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>시그널 봇</title>
+    <title>Watchlist Signal Bot</title>
     <style>
       :root {
         --bg: #f4efe6;
@@ -205,6 +205,11 @@
         border-radius: 999px;
         font-size: 0.82rem;
         border: 1px solid transparent;
+        white-space: nowrap;
+      }
+
+      .state-pill {
+        justify-content: center;
       }
 
       .badge-positive {
@@ -275,7 +280,7 @@
       <section class="hero">
         <div class="hero-main">
           <p class="subtle">규칙 기반 관심종목 모니터</p>
-          <h1>시그널 봇</h1>
+          <h1>Watchlist Signal Bot</h1>
           <p class="subtle" style="margin-top: 14px; max-width: 680px;">
             한국과 미국 관심종목을 매일 점검하고, 설명 가능한 기술적 신호와
             모멘텀 변화만 추려서 보여주는 리포트입니다.
@@ -379,7 +384,8 @@
                 <tr>
                   <td>
                     <strong>{{ card.symbol }}</strong> {{ card.name }}<br />
-                    <span class="subtle">{{ card.state }} | {{ card.events|map(attribute='label')|join(', ') }}</span>
+                    <span class="badge {{ card.state_class_name }} state-pill">{{ card.state }}</span>
+                    <span class="subtle"> | {{ card.events|map(attribute='label')|join(', ') }}</span>
                   </td>
                   <td>{{ card.score }}</td>
                 </tr>
@@ -396,7 +402,7 @@
                   <tr>
                     <td>
                       <strong>{{ card.symbol }}</strong> {{ card.name }}<br />
-                      <span class="subtle">{{ card.state }}</span>
+                      <span class="badge {{ card.state_class_name }} state-pill">{{ card.state }}</span>
                     </td>
                     <td>{{ card.score }}</td>
                   </tr>
@@ -417,7 +423,8 @@
                 <tr>
                   <td>
                     <strong>{{ card.symbol }}</strong> {{ card.name }}<br />
-                    <span class="subtle">{{ card.state }} | {{ card.events|map(attribute='label')|join(', ') }}</span>
+                    <span class="badge {{ card.state_class_name }} state-pill">{{ card.state }}</span>
+                    <span class="subtle"> | {{ card.events|map(attribute='label')|join(', ') }}</span>
                   </td>
                   <td>{{ card.score }}</td>
                 </tr>
@@ -440,7 +447,7 @@
                 </div>
                 <div class="score">
                   <strong>{{ card.score }}</strong>
-                  <p class="subtle">{{ card.state }}</p>
+                  <span class="badge {{ card.state_class_name }} state-pill">{{ card.state }}</span>
                 </div>
               </div>
               <p class="subtle">가격 {{ card.price }}</p>
