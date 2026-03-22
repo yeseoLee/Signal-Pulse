@@ -9,7 +9,7 @@ from watchlist_signal_bot.models import SymbolConfig
 
 
 class FDRFetcher(BaseFetcher):
-    name = "fdr"
+    name = "FinanceDataReader"
 
     def fetch(self, symbol: SymbolConfig, start: date, end: date) -> pd.DataFrame:
         try:

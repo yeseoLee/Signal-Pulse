@@ -4,7 +4,7 @@ from datetime import date
 
 import pandas as pd
 
-from watchlist_signal_bot.fetchers import FDRFetcher, PykrxFetcher, YFinanceFetcher
+from watchlist_signal_bot.fetchers import FDRFetcher
 from watchlist_signal_bot.indicators import (
     add_momentum_indicators,
     add_relative_strength,
@@ -27,11 +27,8 @@ from watchlist_signal_bot.utils.retry import retry_call
 
 
 def select_fetchers(symbol: SymbolConfig):
-    if symbol.market == "KR" and symbol.asset_type == "equity":
-        return [PykrxFetcher(), FDRFetcher()]
-    if symbol.market == "KR":
-        return [FDRFetcher(), PykrxFetcher()]
-    return [YFinanceFetcher(), FDRFetcher()]
+    del symbol
+    return [FDRFetcher()]
 
 
 def fetch_with_fallback(

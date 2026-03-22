@@ -7,7 +7,7 @@ import pandas as pd
 
 from watchlist_signal_bot.fetchers.base import BaseFetcher
 from watchlist_signal_bot.models import SymbolConfig
-from watchlist_signal_bot.pipeline import fetch_with_fallback
+from watchlist_signal_bot.pipeline import fetch_with_fallback, select_fetchers
 from watchlist_signal_bot.storage import ParquetStore
 
 
@@ -34,6 +34,15 @@ class SuccessFetcher(BaseFetcher):
             },
             index=index,
         )
+
+
+def test_select_fetchers_uses_finance_data_reader_only():
+    symbol = SymbolConfig(symbol="AAPL", market="US", name="Apple", group="core")
+
+    fetchers = select_fetchers(symbol)
+
+    assert len(fetchers) == 1
+    assert fetchers[0].name == "FinanceDataReader"
 
 
 def test_fetch_with_secondary_source(tmp_path):
