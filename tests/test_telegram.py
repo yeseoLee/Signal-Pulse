@@ -18,7 +18,7 @@ def _result(
     return AnalysisResult(
         config=SymbolConfig(symbol=symbol, market="US", name=name, group="core_us"),
         as_of=date(2026, 3, 20),
-        source="yfinance",
+        source="FinanceDataReader",
         data_quality=quality,
         fetched_at=datetime(2026, 3, 20, 18, 0, 0),
         indicators=indicators,
@@ -198,3 +198,5 @@ def test_telegram_summary_renders_natural_language_sections():
     assert "상대강도가 약화되고 있습니다." in message
     assert "지표점수:" not in message
     assert "Score" not in message
+    assert "신규수집" not in message
+    assert "대체소스" not in message

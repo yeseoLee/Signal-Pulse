@@ -9,13 +9,6 @@ from watchlist_signal_bot.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
-QUALITY_LABELS = {
-    "fresh": "신규수집",
-    "fallback": "대체소스",
-    "stale": "캐시재사용",
-    "partial": "부분성공",
-}
-
 
 def render_telegram_summary(
     results: list[AnalysisResult],
@@ -151,10 +144,7 @@ def _bucket_label(result: AnalysisResult) -> str:
 
 def _result_lines(index: int, result: AnalysisResult) -> list[str]:
     lines = [
-        (
-            f"{index}. {result.config.symbol} ({result.config.name}) | "
-            f"{_quality_label(result.data_quality)}"
-        ),
+        f"{index}. {result.config.symbol} ({result.config.name})",
         f"   - {_describe_moving_average(result)}",
         f"   - {_describe_breakout(result)}",
         f"   - {_describe_rsi(result)}",
@@ -333,7 +323,3 @@ def _fmt_percent(value: object) -> str:
     if _is_missing(value):
         return "N/A"
     return f"{float(value):+.1f}%"
-
-
-def _quality_label(quality: str) -> str:
-    return QUALITY_LABELS.get(quality, quality)
