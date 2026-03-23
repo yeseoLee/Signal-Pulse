@@ -150,6 +150,18 @@ make check-workflows
 - 지지/저항 zone
 - 실패 종목 목록
 
+## 스크린샷
+
+### Telegram
+
+![Telegram 리포트 스크린샷](./assets/screenshot_telegram.png)
+
+### HTML
+
+![HTML 리포트 스크린샷 1](./assets/screenshot_html_1.png)
+
+![HTML 리포트 스크린샷 2](./assets/screenshot_html2.png)
+
 ## 환경 변수
 
 - `TELEGRAM_BOT_TOKEN`

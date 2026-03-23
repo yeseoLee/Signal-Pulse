@@ -133,6 +133,18 @@ Each symbol gets:
 - Support/resistance zones
 - Failed symbols section
 
+## Screenshots
+
+### Telegram
+
+![Telegram report screenshot](./assets/screenshot_telegram.png)
+
+### HTML
+
+![HTML report screenshot 1](./assets/screenshot_html_1.png)
+
+![HTML report screenshot 2](./assets/screenshot_html2.png)
+
 ## Environment Variables
 
 - `TELEGRAM_BOT_TOKEN`
