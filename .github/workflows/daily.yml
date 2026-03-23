@@ -30,7 +30,9 @@ on:
         type: "boolean"
 
 permissions:
-  contents: "write"
+  contents: "read"
+  pages: "write"
+  id-token: "write"
 
 concurrency:
   group: "daily-signal-bot-${{ github.ref }}"
@@ -74,7 +76,12 @@ jobs:
           fi
           "${cmd[@]}"
 
+      - name: "Setup GitHub Pages"
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.publish_pages != 'false' }}
+        uses: "actions/configure-pages@v5"
+
       - name: "Prepare Pages bundle"
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.publish_pages != 'false' }}
         run: |
           mkdir -p public
           cp artifacts/report.html public/index.html
@@ -82,6 +89,12 @@ jobs:
           cp artifacts/signals_daily.csv public/signals_daily.csv
           cp artifacts/signal_history.csv public/signal_history.csv
           touch public/.nojekyll
+
+      - name: "Upload Pages artifact"
+        if: ${{ github.event_name == 'schedule' || github.event.inputs.publish_pages != 'false' }}
+        uses: "actions/upload-pages-artifact@v3"
+        with:
+          path: "public"
 
       - name: "Upload runtime artifacts"
         uses: "actions/upload-artifact@v4"
@@ -91,12 +104,14 @@ jobs:
             artifacts
             data/prices
 
-      - name: "Deploy to gh-pages branch"
-        if: ${{ github.event_name == 'schedule' || github.event.inputs.publish_pages != 'false' }}
-        uses: "peaceiris/actions-gh-pages@v4"
-        with:
-          github_token: "${{ secrets.GITHUB_TOKEN }}"
-          publish_branch: "gh-pages"
-          publish_dir: "public"
-          force_orphan: true
-          enable_jekyll: false
+  deploy:
+    runs-on: "ubuntu-latest"
+    needs: "build"
+    if: ${{ github.event_name == 'schedule' || github.event.inputs.publish_pages != 'false' }}
+    environment:
+      name: "github-pages"
+      url: "${{ steps.deployment.outputs.page_url }}"
+    steps:
+      - name: "Deploy to GitHub Pages"
+        id: "deployment"
+        uses: "actions/deploy-pages@v4"

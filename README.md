@@ -24,7 +24,7 @@
 2. [`config/thresholds.yml`](./config/thresholds.yml)에서 pivot window, 병합 tolerance, zone 폭을 수정합니다.
 3. [`config/github_actions.yml`](./config/github_actions.yml)에서 실행 주기와 기본 옵션을 수정합니다.
 4. GitHub 저장소 `Settings > Secrets and variables > Actions`에 `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`를 등록합니다.
-5. GitHub 저장소 `Settings > Pages`에서 `gh-pages` 브랜치 `/ (root)`를 Pages 소스로 지정합니다.
+5. GitHub 저장소 `Settings > Pages`에서 배포 소스를 `GitHub Actions`로 지정합니다.
 6. 필요하면 `GITHUB_PAGES_URL` 환경변수에 본인 Pages 주소를 넣어 텔레그램 링크를 고정할 수 있습니다.
 
 ## 빠른 시작
@@ -86,7 +86,7 @@ GitHub Actions 관련 설정을 관리합니다.
 
 - GitHub Actions의 `schedule`은 런타임에 설정 파일을 읽을 수 없습니다.
 - 그래서 이 프로젝트는 [`config/github_actions.yml`](./config/github_actions.yml)을 소스로 사용하고, [`.github/workflows/`](./.github/workflows/) 아래 YAML은 생성물로 관리합니다.
-- 리포트 HTML은 workflow가 `public/` 번들을 만든 뒤 `gh-pages` 전용 브랜치로 푸시합니다.
+- 리포트 HTML은 workflow가 `public/` 번들을 만든 뒤 GitHub Pages artifact로 업로드하고, GitHub Actions가 이를 배포합니다.
 - 설정 변경 후 아래 명령으로 워크플로를 다시 생성해야 합니다.
 
 ```bash

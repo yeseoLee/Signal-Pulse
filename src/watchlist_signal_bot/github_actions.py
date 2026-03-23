@@ -18,7 +18,9 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
         "file": ".github/workflows/daily.yml",
         "name": "Daily Signal Bot",
         "permissions": {
-            "contents": "write",
+            "contents": "read",
+            "pages": "write",
+            "id-token": "write",
         },
         "concurrency": {
             "group": "daily-signal-bot-${{ github.ref }}",
@@ -57,7 +59,6 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
         "pages": {
             "enabled": True,
             "public_dir": "public",
-            "publish_branch": "gh-pages",
             "bundle_files": [
                 {"source": "artifacts/report.html", "target": "public/index.html"},
                 {"source": "artifacts/report.json", "target": "public/report.json"},
@@ -77,7 +78,9 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
         "file": ".github/workflows/manual.yml",
         "name": "Manual Signal Bot Test",
         "permissions": {
-            "contents": "write",
+            "contents": "read",
+            "pages": "write",
+            "id-token": "write",
         },
         "dispatch_inputs": {
             "symbol": {
@@ -124,7 +127,6 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
         "pages": {
             "enabled": True,
             "public_dir": "public",
-            "publish_branch": "gh-pages",
             "prepare_condition": "${{ github.event.inputs.publish_pages == 'true' }}",
             "deploy_condition": "${{ github.event.inputs.publish_pages == 'true' }}",
             "bundle_files": [
@@ -192,8 +194,15 @@ def render_workflow(*, workflow: dict[str, Any]) -> str:
 
     lines.append("")
     lines.append("jobs:")
-    lines.extend(_render_build_job(workflow=workflow))
+    lines.extend(_render_jobs(workflow=workflow))
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _render_jobs(*, workflow: dict[str, Any]) -> list[str]:
+    lines: list[str] = []
+    lines.extend(_render_build_job(workflow=workflow))
+    lines.extend(_render_pages_deploy_job(workflow=workflow))
+    return lines
 
 
 def _render_on_block(workflow: dict[str, Any]) -> list[str]:
@@ -256,9 +265,10 @@ def _render_build_job(*, workflow: dict[str, Any]) -> list[str]:
         ]
     )
     lines.extend(_render_run_step(workflow=workflow))
+    lines.extend(_render_pages_setup_step(workflow=workflow))
     lines.extend(_render_pages_prepare_step(workflow=workflow))
+    lines.extend(_render_pages_artifact_step(workflow=workflow))
     lines.extend(_render_runtime_artifact_step(workflow=workflow))
-    lines.extend(_render_pages_deploy_step(workflow=workflow))
     return lines
 
 
@@ -326,8 +336,9 @@ def _render_pages_prepare_step(*, workflow: dict[str, Any]) -> list[str]:
 
     public_dir = pages["public_dir"]
     lines = ['      - name: "Prepare Pages bundle"']
-    if pages.get("prepare_condition"):
-        lines.append(f"        if: {pages['prepare_condition']}")
+    bundle_condition = _pages_bundle_condition(pages)
+    if bundle_condition:
+        lines.append(f"        if: {bundle_condition}")
     lines.extend(
         [
             "        run: |",
@@ -338,6 +349,44 @@ def _render_pages_prepare_step(*, workflow: dict[str, Any]) -> list[str]:
         lines.append(f"          cp {bundle['source']} {bundle['target']}")
     lines.append(f"          touch {public_dir}/.nojekyll")
     lines.append("")
+    return lines
+
+
+def _render_pages_setup_step(*, workflow: dict[str, Any]) -> list[str]:
+    pages = workflow.get("pages", {})
+    if not pages.get("enabled"):
+        return []
+
+    lines = ['      - name: "Setup GitHub Pages"']
+    bundle_condition = _pages_bundle_condition(pages)
+    if bundle_condition:
+        lines.append(f"        if: {bundle_condition}")
+    lines.extend(
+        [
+            '        uses: "actions/configure-pages@v5"',
+            "",
+        ]
+    )
+    return lines
+
+
+def _render_pages_artifact_step(*, workflow: dict[str, Any]) -> list[str]:
+    pages = workflow.get("pages", {})
+    if not pages.get("enabled"):
+        return []
+
+    lines = ['      - name: "Upload Pages artifact"']
+    bundle_condition = _pages_bundle_condition(pages)
+    if bundle_condition:
+        lines.append(f"        if: {bundle_condition}")
+    lines.extend(
+        [
+            '        uses: "actions/upload-pages-artifact@v3"',
+            "        with:",
+            f'          path: "{pages["public_dir"]}"',
+            "",
+        ]
+    )
     return lines
 
 
@@ -356,27 +405,35 @@ def _render_runtime_artifact_step(*, workflow: dict[str, Any]) -> list[str]:
     return lines
 
 
-def _render_pages_deploy_step(*, workflow: dict[str, Any]) -> list[str]:
+def _render_pages_deploy_job(*, workflow: dict[str, Any]) -> list[str]:
     pages = workflow.get("pages", {})
     if not pages.get("enabled"):
         return []
 
-    lines = ['      - name: "Deploy to gh-pages branch"']
+    lines = [
+        "  deploy:",
+        '    runs-on: "ubuntu-latest"',
+        '    needs: "build"',
+    ]
     if pages.get("deploy_condition"):
-        lines.append(f"        if: {pages['deploy_condition']}")
+        lines.append(f"    if: {pages['deploy_condition']}")
     lines.extend(
         [
-            '        uses: "peaceiris/actions-gh-pages@v4"',
-            "        with:",
-            '          github_token: "${{ secrets.GITHUB_TOKEN }}"',
-            f'          publish_branch: "{pages["publish_branch"]}"',
-            f'          publish_dir: "{pages["public_dir"]}"',
-            "          force_orphan: true",
-            "          enable_jekyll: false",
+            "    environment:",
+            '      name: "github-pages"',
+            '      url: "${{ steps.deployment.outputs.page_url }}"',
+            "    steps:",
+            '      - name: "Deploy to GitHub Pages"',
+            '        id: "deployment"',
+            '        uses: "actions/deploy-pages@v4"',
             "",
         ]
     )
     return lines
+
+
+def _pages_bundle_condition(pages: dict[str, Any]) -> str | None:
+    return pages.get("prepare_condition") or pages.get("deploy_condition")
 
 
 def _build_daily_workflow(config: dict[str, Any]) -> dict[str, Any]:

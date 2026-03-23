@@ -24,7 +24,7 @@ If you want to run this from your own fork, set up these items first.
 2. Update [`config/thresholds.yml`](./config/thresholds.yml) for pivot window, merge tolerance, and zone width.
 3. Update [`config/github_actions.yml`](./config/github_actions.yml) for your schedule and workflow defaults.
 4. Add `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` under `Settings > Secrets and variables > Actions`.
-5. In `Settings > Pages`, set GitHub Pages to use the `gh-pages` branch and `/ (root)`.
+5. In `Settings > Pages`, set the deployment source to `GitHub Actions`.
 6. If needed, set `GITHUB_PAGES_URL` to pin the report link shown in Telegram.
 
 ## Quick Start
@@ -75,6 +75,8 @@ Defines the user-facing GitHub Actions settings.
 - `daily.schedule`: recurring cron entries
 - `daily.options`: defaults for scheduled runs
 - `manual.options`: defaults for manual runs
+
+The HTML report is bundled into `public/`, uploaded as a GitHub Pages artifact, and then deployed by GitHub Actions.
 
 After changing this config, regenerate the workflow files.
 
