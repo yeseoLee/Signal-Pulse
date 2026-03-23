@@ -3,57 +3,43 @@ groups:
     - "005930"
     - "000660"
     - "005380"
+    - KOSPI
   core_us:
     - AAPL
-    - MSFT
     - NVDA
-    - AMZN
-    - META
     - GOOGL
+    - "S&P500"
 
 metadata:
   "005930":
     market: KR
     name: 삼성전자
-    benchmark: KOSPI
     asset_type: equity
   "000660":
     market: KR
     name: SK하이닉스
-    benchmark: KOSPI
     asset_type: equity
   "005380":
     market: KR
     name: 현대차
-    benchmark: KOSPI
     asset_type: equity
+  KOSPI:
+    market: KR
+    name: KOSPI
+    asset_type: index
   AAPL:
     market: US
     name: Apple
-    benchmark: SPY
-    asset_type: equity
-  MSFT:
-    market: US
-    name: Microsoft
-    benchmark: SPY
     asset_type: equity
   NVDA:
     market: US
     name: NVIDIA
-    benchmark: SPY
-    asset_type: equity
-  AMZN:
-    market: US
-    name: Amazon
-    benchmark: SPY
-    asset_type: equity
-  META:
-    market: US
-    name: Meta Platforms
-    benchmark: SPY
     asset_type: equity
   GOOGL:
     market: US
     name: Alphabet Class A
-    benchmark: SPY
     asset_type: equity
+  "S&P500":
+    market: US
+    name: S&P500
+    asset_type: index

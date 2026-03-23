@@ -8,16 +8,16 @@ from watchlist_signal_bot.pipeline import analyze_symbol, fetch_with_fallback
 from watchlist_signal_bot.reports.html import render_html_report
 from watchlist_signal_bot.reports.telegram import render_telegram_summary, send_telegram_message
 from watchlist_signal_bot.settings import AppSettings, load_yaml_file
+from watchlist_signal_bot.signals import normalize_output_price
 from watchlist_signal_bot.storage import HistoryStore, ParquetStore
 from watchlist_signal_bot.universe import (
-    build_benchmark_universe,
     filter_universe,
-    load_benchmarks,
     load_watchlist,
     normalize_symbol,
 )
 from watchlist_signal_bot.utils.dates import build_window, resolve_end_date
 from watchlist_signal_bot.utils.logging import configure_logging, get_logger
+from watchlist_signal_bot.utils.sorting import asset_priority
 
 logger = get_logger(__name__)
 
@@ -27,7 +27,6 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--root-dir", default=".", help="Project root directory")
     parser.add_argument("--watchlist", help="Path to watchlist.yml")
     parser.add_argument("--thresholds", help="Path to thresholds.yml")
-    parser.add_argument("--benchmarks", help="Path to benchmarks.yml")
     parser.add_argument("--market", choices=["KR", "US"], help="Filter by market")
     parser.add_argument("--group", action="append", help="Filter by watchlist group")
     parser.add_argument("--symbol", action="append", help="Filter by symbol")
@@ -51,17 +50,11 @@ def main() -> int:
         root_dir=root_dir,
         watchlist_path=Path(args.watchlist).resolve() if args.watchlist else None,
         thresholds_path=Path(args.thresholds).resolve() if args.thresholds else None,
-        benchmarks_path=Path(args.benchmarks).resolve() if args.benchmarks else None,
     )
     settings.ensure_directories()
 
     thresholds = load_yaml_file(settings.thresholds_path)
-    benchmark_defaults, benchmark_catalog = load_benchmarks(settings.benchmarks_path)
-    universe = load_watchlist(
-        settings.watchlist_path,
-        default_benchmarks=benchmark_defaults,
-        benchmark_catalog=benchmark_catalog,
-    )
+    universe = load_watchlist(settings.watchlist_path)
     selected_symbols = {normalize_symbol(symbol) for symbol in args.symbol} if args.symbol else None
     selected_groups = set(args.group) if args.group else None
     filtered = filter_universe(
@@ -77,28 +70,11 @@ def main() -> int:
     end_date = resolve_end_date(args.end_date)
     start_date, end_date = build_window(lookback_days=settings.lookback_days, end_date=end_date)
     price_store = ParquetStore(settings.prices_dir)
-    benchmark_store = ParquetStore(settings.cache_dir)
     history_store = HistoryStore(
         daily_csv=settings.daily_csv_path,
         history_csv=settings.history_csv_path,
         report_json=settings.report_json_path,
     )
-
-    benchmark_requests = build_benchmark_universe(filtered, benchmark_catalog)
-    benchmark_frames = {}
-    benchmark_failures = {}
-    for benchmark_symbol, benchmark_config in benchmark_requests.items():
-        try:
-            outcome = fetch_with_fallback(
-                benchmark_config,
-                start=start_date,
-                end=end_date,
-                store=benchmark_store,
-            )
-            benchmark_frames[benchmark_symbol] = outcome.frame
-        except Exception as exc:  # noqa: BLE001
-            benchmark_failures[benchmark_symbol] = str(exc)
-            logger.warning("Benchmark fetch failed for %s: %s", benchmark_symbol, exc)
 
     analyses = []
     failures = {}
@@ -110,15 +86,11 @@ def main() -> int:
                 end=end_date,
                 store=price_store,
             )
-            benchmark_frame = (
-                benchmark_frames.get(symbol_config.benchmark) if symbol_config.benchmark else None
-            )
             analyses.append(
                 analyze_symbol(
                     symbol_config,
                     price_outcome=price_outcome,
                     thresholds=thresholds,
-                    benchmark_frame=benchmark_frame,
                 )
             )
         except Exception as exc:  # noqa: BLE001
@@ -135,7 +107,6 @@ def main() -> int:
     report_payload = build_report_payload(
         analyses=analyses,
         failures=failures,
-        benchmark_failures=benchmark_failures,
         history_frame=history_frame,
     )
     history_store.write_report_json(report_payload)
@@ -143,7 +114,6 @@ def main() -> int:
     telegram_text = render_telegram_summary(
         analyses,
         failures=failures,
-        benchmark_failures=benchmark_failures,
         github_pages_url=settings.github_pages_url,
     )
     settings.telegram_path.write_text(telegram_text, encoding="utf-8")
@@ -152,7 +122,6 @@ def main() -> int:
         html = render_html_report(
             analyses,
             failures=failures,
-            benchmark_failures=benchmark_failures,
             history_frame=history_frame,
         )
         settings.html_path.write_text(html, encoding="utf-8")
@@ -168,31 +137,60 @@ def main() -> int:
     return 0
 
 
-def build_report_payload(*, analyses, failures, benchmark_failures, history_frame):
+def build_report_payload(*, analyses, failures, history_frame):
     return {
         "summary": {
             "success_count": len(analyses),
             "failure_count": len(failures),
-            "benchmark_failure_count": len(benchmark_failures),
         },
         "failures": failures,
-        "benchmark_failures": benchmark_failures,
-        "signals": [
+        "reports": [
             {
                 "symbol": item.config.symbol,
                 "name": item.config.name,
                 "market": item.config.market,
                 "group": item.config.group,
-                "state": item.state,
-                "score": item.score,
-                "indicator_scores": item.indicator_scores,
-                "confidence": item.confidence,
+                "asset_type": item.config.asset_type,
+                "asset_priority": asset_priority(item.config.asset_type),
+                "short_trend_label": item.short_trend_label,
+                "medium_trend_label": item.medium_trend_label,
+                "long_trend_label": item.long_trend_label,
+                "trend_label": item.trend_label,
+                "trend_score": item.trend_score,
                 "source": item.source,
                 "data_quality": item.data_quality,
-                "events": [event.code for event in item.display_events],
+                "supports": [
+                    {
+                        "lower": normalize_output_price(zone.lower, market=item.config.market),
+                        "upper": normalize_output_price(zone.upper, market=item.config.market),
+                        "center": normalize_output_price(zone.center, market=item.config.market),
+                        "touches": zone.touches,
+                    }
+                    for zone in item.support_zones
+                ],
+                "resistances": [
+                    {
+                        "lower": normalize_output_price(zone.lower, market=item.config.market),
+                        "upper": normalize_output_price(zone.upper, market=item.config.market),
+                        "center": normalize_output_price(zone.center, market=item.config.market),
+                        "touches": zone.touches,
+                    }
+                    for zone in item.resistance_zones
+                ],
+                "trend_summary": item.trend_summary,
+                "support_summary": item.support_summary,
+                "resistance_summary": item.resistance_summary,
                 "indicators": item.indicators,
             }
-            for item in sorted(analyses, key=lambda result: result.score, reverse=True)
+            for item in sorted(
+                analyses,
+                key=lambda result: (
+                    result.trend_label,
+                    asset_priority(result.config.asset_type),
+                    -result.trend_score,
+                    result.config.symbol,
+                ),
+            )
         ],
         "history_tail": json.loads(history_frame.tail(50).to_json(orient="records")),
     }

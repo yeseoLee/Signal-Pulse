@@ -6,16 +6,16 @@
     <title>Watchlist Signal Bot</title>
     <style>
       :root {
-        --bg: #f4efe6;
-        --panel: rgba(255, 250, 241, 0.82);
-        --ink: #13212e;
-        --muted: #617080;
-        --accent: #cf5c36;
-        --accent-2: #1e847f;
-        --accent-3: #c7a84f;
-        --danger: #912f40;
-        --border: rgba(19, 33, 46, 0.12);
-        --shadow: 0 18px 40px rgba(19, 33, 46, 0.08);
+        --bg: #f6f1e8;
+        --panel: rgba(255, 252, 247, 0.9);
+        --ink: #15202b;
+        --muted: #667481;
+        --line: rgba(21, 32, 43, 0.1);
+        --rise: #0f766e;
+        --flat: #9a6b21;
+        --fall: #9f1239;
+        --accent: #c46a2f;
+        --shadow: 0 20px 44px rgba(21, 32, 43, 0.08);
       }
 
       * {
@@ -24,12 +24,12 @@
 
       body {
         margin: 0;
-        font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
         color: var(--ink);
+        font-family: "IBM Plex Sans", "Noto Sans KR", sans-serif;
         background:
-          radial-gradient(circle at top left, rgba(207, 92, 54, 0.15), transparent 28%),
-          radial-gradient(circle at top right, rgba(30, 132, 127, 0.16), transparent 22%),
-          linear-gradient(180deg, #fff7ec 0%, #f4efe6 100%);
+          radial-gradient(circle at top left, rgba(196, 106, 47, 0.14), transparent 28%),
+          radial-gradient(circle at top right, rgba(15, 118, 110, 0.12), transparent 24%),
+          linear-gradient(180deg, #fff8ee 0%, var(--bg) 100%);
       }
 
       .page {
@@ -38,32 +38,24 @@
         padding: 32px 20px 72px;
       }
 
-      .hero {
-        display: grid;
-        gap: 20px;
-        grid-template-columns: 1.6fr 1fr;
-        align-items: stretch;
-      }
-
-      .hero-main,
-      .hero-side,
+      .hero,
       .panel,
-      .symbol-card {
+      .card {
         background: var(--panel);
-        backdrop-filter: blur(8px);
-        border: 1px solid var(--border);
+        border: 1px solid var(--line);
         border-radius: 24px;
         box-shadow: var(--shadow);
       }
 
-      .hero-main {
+      .hero {
         padding: 28px;
       }
 
-      .hero-side {
-        padding: 24px;
+      .hero-grid {
         display: grid;
-        gap: 14px;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 18px;
+        align-items: start;
       }
 
       h1,
@@ -73,61 +65,65 @@
         margin: 0;
       }
 
+      h1,
+      h2 {
+        font-family: "IBM Plex Serif", "Noto Serif KR", serif;
+      }
+
       h1 {
-        font-family: "IBM Plex Serif", Georgia, serif;
         font-size: clamp(2.2rem, 5vw, 3.4rem);
-        letter-spacing: -0.04em;
         line-height: 0.95;
+        letter-spacing: -0.04em;
       }
 
       h2 {
-        font-family: "IBM Plex Serif", Georgia, serif;
-        font-size: 1.6rem;
+        font-size: 1.5rem;
         margin-bottom: 16px;
       }
 
-      .subtle {
+      .muted {
         color: var(--muted);
+      }
+
+      .hero-copy {
+        display: grid;
+        gap: 14px;
+      }
+
+      .hero-copy p {
+        max-width: 44rem;
+        line-height: 1.55;
       }
 
       .stat-grid {
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 28px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
       }
 
       .stat {
         padding: 16px;
         border-radius: 18px;
-        background: rgba(255, 255, 255, 0.58);
-        border: 1px solid rgba(19, 33, 46, 0.08);
+        background: rgba(255, 255, 255, 0.68);
+        border: 1px solid rgba(21, 32, 43, 0.08);
       }
 
       .stat strong {
         display: block;
+        margin-bottom: 4px;
         font-size: 1.7rem;
-        margin-bottom: 6px;
       }
 
       .section {
-        margin-top: 26px;
+        margin-top: 24px;
       }
 
       .panel {
         padding: 22px;
       }
 
-      .grid-2 {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 18px;
-      }
-
-      .grid-3 {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 18px;
+      .table-wrap {
+        overflow-x: auto;
       }
 
       table {
@@ -137,9 +133,9 @@
 
       th,
       td {
-        padding: 10px 0;
+        padding: 12px 0;
+        border-bottom: 1px solid rgba(21, 32, 43, 0.08);
         text-align: left;
-        border-bottom: 1px solid rgba(19, 33, 46, 0.08);
         vertical-align: top;
       }
 
@@ -148,107 +144,138 @@
         font-weight: 600;
       }
 
-      .symbol-grid {
+      .section-title {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .card-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         gap: 18px;
       }
 
-      .symbol-card {
-        padding: 20px;
+      .card {
+        padding: 22px;
         position: relative;
         overflow: hidden;
       }
 
-      .symbol-card::after {
+      .card::after {
         content: "";
         position: absolute;
-        inset: auto -30px -30px auto;
+        right: -28px;
+        bottom: -28px;
         width: 120px;
         height: 120px;
         border-radius: 999px;
-        background: linear-gradient(135deg, rgba(207, 92, 54, 0.18), transparent);
+        background: linear-gradient(135deg, rgba(196, 106, 47, 0.16), transparent);
       }
 
-      .symbol-header {
+      .card-top {
         display: flex;
         justify-content: space-between;
         gap: 16px;
+        align-items: flex-start;
         margin-bottom: 12px;
       }
 
-      .symbol-header strong {
+      .card-top strong {
         display: block;
-        font-size: 1.2rem;
+        font-size: 1.18rem;
+        margin-bottom: 4px;
       }
 
-      .score {
+      .price {
         text-align: right;
+        font-size: 1.05rem;
+        font-weight: 700;
       }
 
-      .score strong {
-        font-size: 2rem;
-        line-height: 1;
-      }
-
-      .badge-row,
+      .chip-row,
       .metric-row {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
       }
 
-      .badge {
+      .chip,
+      .metric {
         display: inline-flex;
         align-items: center;
-        padding: 6px 10px;
         border-radius: 999px;
+        white-space: nowrap;
+        word-break: keep-all;
+      }
+
+      .chip {
+        padding: 6px 10px;
         font-size: 0.82rem;
         border: 1px solid transparent;
-        white-space: nowrap;
       }
 
-      .state-pill {
-        justify-content: center;
+      .chip-trend-up {
+        background: rgba(15, 118, 110, 0.1);
+        color: var(--rise);
+        border-color: rgba(15, 118, 110, 0.18);
       }
 
-      .badge-positive {
-        background: rgba(30, 132, 127, 0.1);
-        color: var(--accent-2);
-        border-color: rgba(30, 132, 127, 0.16);
+      .chip-trend-flat {
+        background: rgba(154, 107, 33, 0.1);
+        color: var(--flat);
+        border-color: rgba(154, 107, 33, 0.18);
       }
 
-      .badge-neutral {
-        background: rgba(199, 168, 79, 0.12);
-        color: #7a6121;
-        border-color: rgba(199, 168, 79, 0.18);
+      .chip-trend-down {
+        background: rgba(159, 18, 57, 0.1);
+        color: var(--fall);
+        border-color: rgba(159, 18, 57, 0.18);
       }
 
-      .badge-negative {
-        background: rgba(145, 47, 64, 0.11);
-        color: var(--danger);
-        border-color: rgba(145, 47, 64, 0.18);
+      .chip-level {
+        background: rgba(255, 255, 255, 0.72);
+        border-color: rgba(21, 32, 43, 0.08);
       }
 
       .metric {
-        min-width: 74px;
         padding: 10px 12px;
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.65);
-        border: 1px solid rgba(19, 33, 46, 0.08);
+        min-width: 88px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(21, 32, 43, 0.08);
+        flex-direction: column;
+        align-items: flex-start;
       }
 
       .metric span {
-        display: block;
-        font-size: 0.75rem;
+        font-size: 0.74rem;
         color: var(--muted);
         margin-bottom: 4px;
+      }
+
+      .summary-block {
+        margin-top: 14px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .summary-block p {
+        line-height: 1.55;
+      }
+
+      .label {
+        color: var(--muted);
+        font-size: 0.82rem;
+        margin-bottom: 6px;
       }
 
       .sparkline {
         width: 100%;
         height: 68px;
-        margin: 12px 0 16px;
+        margin-top: 14px;
       }
 
       .sparkline polyline {
@@ -259,16 +286,18 @@
         stroke-linejoin: round;
       }
 
-      .footer-note {
-        margin-top: 20px;
+      .empty {
+        color: var(--muted);
+      }
+
+      .footer {
+        margin-top: 22px;
         color: var(--muted);
         font-size: 0.92rem;
       }
 
       @media (max-width: 900px) {
-        .hero,
-        .grid-2,
-        .grid-3,
+        .hero-grid,
         .stat-grid {
           grid-template-columns: 1fr;
         }
@@ -278,257 +307,183 @@
   <body>
     <div class="page">
       <section class="hero">
-        <div class="hero-main">
-          <p class="subtle">규칙 기반 관심종목 모니터</p>
-          <h1>Watchlist Signal Bot</h1>
-          <p class="subtle" style="margin-top: 14px; max-width: 680px;">
-            한국과 미국 관심종목을 매일 점검하고, 설명 가능한 기술적 신호와
-            모멘텀 변화만 추려서 보여주는 리포트입니다.
-          </p>
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <p class="muted">주간 기술적 분석 보고서</p>
+            <h1>Watchlist Signal Bot</h1>
+            <p>
+              이동평균선 기반 추세, pivot 기반 지지·저항, 20일·60일·120일 수익률을
+              기준으로 관심 종목의 현재 구조를 요약합니다.
+            </p>
+            <p class="muted">기준일 {{ as_of }}</p>
+          </div>
           <div class="stat-grid">
             <div class="stat">
               <strong>{{ total_symbols }}</strong>
-              <span class="subtle">점검 종목</span>
+              <span class="muted">점검 종목</span>
             </div>
             <div class="stat">
-              <strong>{{ signal_count }}</strong>
-              <span class="subtle">신호 발생 종목</span>
+              <strong>{{ uptrend_count }}</strong>
+              <span class="muted">상승 추세</span>
             </div>
             <div class="stat">
-              <strong>{{ bullish_count }}</strong>
-              <span class="subtle">강세</span>
+              <strong>{{ sideways_count }}</strong>
+              <span class="muted">횡보</span>
             </div>
             <div class="stat">
-              <strong>{{ bearish_count }}</strong>
-              <span class="subtle">약세</span>
+              <strong>{{ downtrend_count }}</strong>
+              <span class="muted">하락 추세</span>
             </div>
           </div>
         </div>
-        <aside class="hero-side">
-          <div>
-            <p class="subtle">기준일</p>
-            <h2 style="margin: 6px 0 0;">{{ as_of }}</h2>
-          </div>
-          <div>
-            <p class="subtle">종목 수집 실패</p>
-            <h2 style="margin: 6px 0 0;">{{ failures|length }}</h2>
-          </div>
-          <div>
-            <p class="subtle">벤치마크 수집 실패</p>
-            <h2 style="margin: 6px 0 0;">{{ benchmark_failures|length }}</h2>
-          </div>
-        </aside>
       </section>
 
-      <section class="section grid-2">
-        <div class="panel">
-          <h2>오늘 새로 발생한 신호</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>종목</th>
-                <th>점수</th>
-                <th>신규 이벤트</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% if new_signal_rows %}
-                {% for row in new_signal_rows[:12] %}
+      <section class="section panel">
+        <div class="section-title">
+          <h2>추세 변화</h2>
+          <span class="muted">직전 기록 대비 라벨 변경</span>
+        </div>
+        {% if trend_change_rows %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>종목</th>
+                  <th>이전</th>
+                  <th>현재</th>
+                  <th>20일 수익률</th>
+                  <th>60일 수익률</th>
+                  <th>120일 수익률</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in trend_change_rows %}
                   <tr>
-                    <td>{{ row.symbol }} {{ row.name }}</td>
-                    <td>{{ row.score }}</td>
-                    <td>{{ row.new_events_label }}</td>
+                    <td>{{ row.symbol }} ({{ row.name }})</td>
+                    <td>{{ row.previous_trend_label }}</td>
+                    <td>{{ row.trend_label }}</td>
+                    <td>{{ "%.1f"|format(row.return_20d) if row.return_20d == row.return_20d else "-" }}%</td>
+                    <td>{{ "%.1f"|format(row.return_60d) if row.return_60d == row.return_60d else "-" }}%</td>
+                    <td>{{ "%.1f"|format(row.return_120d) if row.return_120d == row.return_120d else "-" }}%</td>
                   </tr>
                 {% endfor %}
-              {% else %}
-                <tr>
-                  <td colspan="3" class="subtle">오늘 새로 추가된 이벤트는 없습니다.</td>
-                </tr>
-              {% endif %}
-            </tbody>
-          </table>
-        </div>
-        <div class="panel">
-          <h2>그룹별 요약</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>그룹</th>
-                <th>종목 수</th>
-                <th>평균 점수</th>
-                <th>강세</th>
-                <th>약세</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for row in group_summary %}
-                <tr>
-                  <td>{{ row.group_label }}</td>
-                  <td>{{ row.count }}</td>
-                  <td>{{ row.avg_score }}</td>
-                  <td>{{ row.bullish }}</td>
-                  <td>{{ row.bearish }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="empty">오늘은 직전 기록 대비 추세 라벨이 바뀐 종목이 없습니다.</p>
+        {% endif %}
       </section>
 
-      <section class="section grid-3">
-        <div class="panel">
-          <h2>강한 모멘텀</h2>
-          <table>
-            <tbody>
-              {% for card in strong_momentum %}
-                <tr>
-                  <td>
-                    <strong>{{ card.symbol }}</strong> {{ card.name }}<br />
-                    <span class="badge {{ card.state_class_name }} state-pill">{{ card.state }}</span>
-                    <span class="subtle"> | {{ card.events|map(attribute='label')|join(', ') }}</span>
-                  </td>
-                  <td>{{ card.score }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <div class="panel">
-          <h2>눌림 관찰 후보</h2>
-          <table>
-            <tbody>
-              {% if pullbacks %}
-                {% for card in pullbacks %}
-                  <tr>
-                    <td>
-                      <strong>{{ card.symbol }}</strong> {{ card.name }}<br />
-                      <span class="badge {{ card.state_class_name }} state-pill">{{ card.state }}</span>
-                    </td>
-                    <td>{{ card.score }}</td>
-                  </tr>
-                {% endfor %}
-              {% else %}
-                <tr>
-                  <td colspan="2" class="subtle">오늘은 상승 추세 눌림 후보가 없습니다.</td>
-                </tr>
-              {% endif %}
-            </tbody>
-          </table>
-        </div>
-        <div class="panel">
-          <h2>약해지는 종목</h2>
-          <table>
-            <tbody>
-              {% for card in weakening %}
-                <tr>
-                  <td>
-                    <strong>{{ card.symbol }}</strong> {{ card.name }}<br />
-                    <span class="badge {{ card.state_class_name }} state-pill">{{ card.state }}</span>
-                    <span class="subtle"> | {{ card.events|map(attribute='label')|join(', ') }}</span>
-                  </td>
-                  <td>{{ card.score }}</td>
-                </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="section">
-        <h2>종목별 상세 카드</h2>
-        <div class="symbol-grid">
-          {% for card in all_symbols %}
-            <article class="symbol-card">
-              <div class="symbol-header">
-                <div>
-                  <strong>{{ card.symbol }}</strong>
-                  <p>{{ card.name }}</p>
-                  <p class="subtle">{{ card.market }} | {{ card.group }}</p>
-                </div>
-                <div class="score">
-                  <strong>{{ card.score }}</strong>
-                  <span class="badge {{ card.state_class_name }} state-pill">{{ card.state }}</span>
-                </div>
-              </div>
-              <p class="subtle">가격 {{ card.price }}</p>
-              <svg class="sparkline" viewBox="0 0 220 64" preserveAspectRatio="none">
-                <polyline points="{{ card.sparkline_points }}"></polyline>
-              </svg>
-              <div class="badge-row">
-                {% for event in card.events %}
-                  <span class="badge {{ event.class_name }}">{{ event.label }}</span>
-                {% endfor %}
-              </div>
-              <div class="metric-row" style="margin-top: 14px;">
-                {% for metric in card.metrics %}
-                  <div class="metric">
-                    <span>{{ metric.label }}</span>
-                    <strong>{{ metric.value }}</strong>
+      {% for section in trend_sections %}
+        <section class="section panel">
+          <div class="section-title">
+            <h2>{{ section.label }}</h2>
+            <span class="muted">{{ section.count }}개 종목</span>
+          </div>
+          {% if section.cards %}
+            <div class="card-grid">
+              {% for card in section.cards %}
+                <article class="card">
+                  <div class="card-top">
+                    <div>
+                      <strong>{{ card.symbol }} ({{ card.name }})</strong>
+                      <p class="muted">{{ card.market }} · {{ card.group }}</p>
+                    </div>
+                    <div class="price">{{ card.price }}</div>
                   </div>
-                {% endfor %}
-              </div>
-            </article>
-          {% endfor %}
-        </div>
-      </section>
 
-      <section class="section grid-2">
-        <div class="panel">
-          <h2>데이터 수집 실패</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>종목</th>
-                <th>사유</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% if failures %}
-                {% for symbol, reason in failures.items() %}
+                  <div class="chip-row">
+                    <span class="chip {{ card.trend_badge_class }}">기준 {{ card.trend_label }}</span>
+                    {% for item in card.trend_breakdown %}
+                      <span class="chip {{ item.class_name }}">{{ item.label }}</span>
+                    {% endfor %}
+                  </div>
+
+                  <svg class="sparkline" viewBox="0 0 220 64" preserveAspectRatio="none" aria-hidden="true">
+                    <polyline points="{{ card.sparkline_points }}"></polyline>
+                  </svg>
+
+                  <div class="metric-row">
+                    {% for metric in card.returns %}
+                      <div class="metric">
+                        <span>{{ metric.label }}</span>
+                        <strong>{{ metric.value }}</strong>
+                      </div>
+                    {% endfor %}
+                  </div>
+
+                  <div class="summary-block">
+                    <div>
+                      <p class="label">추세 해석</p>
+                      <p>{{ card.trend_summary }}</p>
+                    </div>
+
+                    <div>
+                      <p class="label">주요 지지</p>
+                      <div class="chip-row">
+                        {% if card.supports %}
+                          {% for item in card.supports %}
+                            <span class="chip chip-level">{{ item }}</span>
+                          {% endfor %}
+                        {% else %}
+                          <span class="empty">가까운 지지 구간이 뚜렷하지 않습니다.</span>
+                        {% endif %}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p class="label">주요 저항</p>
+                      <div class="chip-row">
+                        {% if card.resistances %}
+                          {% for item in card.resistances %}
+                            <span class="chip chip-level">{{ item }}</span>
+                          {% endfor %}
+                        {% else %}
+                          <span class="empty">가까운 저항 구간이 뚜렷하지 않습니다.</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="empty">이 구간에 해당하는 종목이 없습니다.</p>
+          {% endif %}
+        </section>
+      {% endfor %}
+
+      <section class="section panel">
+        <div class="section-title">
+          <h2>실패 종목</h2>
+          <span class="muted">{{ failures|length }}개 종목</span>
+        </div>
+        {% if failures %}
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>종목</th>
+                  <th>사유</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for symbol, reason in failures.items()|sort %}
                   <tr>
                     <td>{{ symbol }}</td>
                     <td>{{ reason }}</td>
                   </tr>
                 {% endfor %}
-              {% else %}
-                <tr>
-                  <td colspan="2" class="subtle">종목 단위 수집 실패는 없습니다.</td>
-                </tr>
-              {% endif %}
-            </tbody>
-          </table>
-        </div>
-        <div class="panel">
-          <h2>벤치마크 상태</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>벤치마크</th>
-                <th>사유</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% if benchmark_failures %}
-                {% for symbol, reason in benchmark_failures.items() %}
-                  <tr>
-                    <td>{{ symbol }}</td>
-                    <td>{{ reason }}</td>
-                  </tr>
-                {% endfor %}
-              {% else %}
-                <tr>
-                  <td colspan="2" class="subtle">모든 벤치마크를 정상적으로 수집했습니다.</td>
-                </tr>
-              {% endif %}
-            </tbody>
-          </table>
-        </div>
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="empty">데이터 수집에 실패한 종목이 없습니다.</p>
+        {% endif %}
       </section>
 
-      <p class="footer-note">
-        이 리포트는 매매 추천이 아니라 우선순위 판단을 돕는 관찰 도구입니다.
-        실시간 수집에 실패하면 저장된 캐시 데이터를 사용할 수 있습니다.
-      </p>
+      <p class="footer">본 리포트는 규칙 기반으로 생성되며 투자 판단을 대체하지 않습니다.</p>
     </div>
   </body>
 </html>

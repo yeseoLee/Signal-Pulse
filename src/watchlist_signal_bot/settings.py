@@ -14,7 +14,6 @@ class AppSettings:
     root_dir: Path
     watchlist_path: Path
     thresholds_path: Path
-    benchmarks_path: Path
     prices_dir: Path
     cache_dir: Path
     metadata_dir: Path
@@ -36,13 +35,11 @@ class AppSettings:
         root_dir: Path,
         watchlist_path: Path | None = None,
         thresholds_path: Path | None = None,
-        benchmarks_path: Path | None = None,
         prices_dir: Path | None = None,
         artifacts_dir: Path | None = None,
     ) -> AppSettings:
         watchlist = watchlist_path or root_dir / "config" / "watchlist.yml"
         thresholds = thresholds_path or root_dir / "config" / "thresholds.yml"
-        benchmarks = benchmarks_path or root_dir / "config" / "benchmarks.yml"
         prices = prices_dir or root_dir / "data" / "prices"
         artifacts = artifacts_dir or root_dir / "artifacts"
         cache_dir = root_dir / "data" / "cache"
@@ -53,7 +50,6 @@ class AppSettings:
             root_dir=root_dir,
             watchlist_path=watchlist,
             thresholds_path=thresholds,
-            benchmarks_path=benchmarks,
             prices_dir=prices,
             cache_dir=cache_dir,
             metadata_dir=metadata_dir,

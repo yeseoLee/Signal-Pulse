@@ -8,24 +8,12 @@ import pandas as pd
 
 
 @dataclass(slots=True)
-class BenchmarkConfig:
-    label: str
-    symbol: str
-    market: str
-    name: str
-    asset_type: str = "index"
-
-
-@dataclass(slots=True)
 class SymbolConfig:
     symbol: str
     market: str
     name: str
     group: str
     asset_type: str = "equity"
-    benchmark: str | None = None
-    benchmark_label: str | None = None
-    benchmark_name: str | None = None
     active: bool = True
     currency: str | None = None
     thresholds: dict[str, Any] = field(default_factory=dict)
@@ -42,12 +30,12 @@ class FetchOutcome:
 
 
 @dataclass(slots=True)
-class Event:
-    code: str
-    polarity: str
-    title: str
-    weight: int
-    detail: str
+class PriceZone:
+    lower: float
+    upper: float
+    center: float
+    touches: int
+    last_date: date | None = None
 
 
 @dataclass(slots=True)
@@ -58,12 +46,15 @@ class AnalysisResult:
     data_quality: str
     fetched_at: datetime | None
     indicators: dict[str, Any]
-    indicator_scores: dict[str, int]
-    events: list[Event]
-    display_events: list[Event]
-    score: int
-    confidence: str
-    state: str
+    short_trend_label: str
+    medium_trend_label: str
+    long_trend_label: str
+    trend_label: str
+    trend_score: int
+    trend_summary: str
     price: float
+    support_zones: list[PriceZone] = field(default_factory=list)
+    resistance_zones: list[PriceZone] = field(default_factory=list)
+    support_summary: str = ""
+    resistance_summary: str = ""
     sparkline: list[float] = field(default_factory=list)
-    benchmark_available: bool = False

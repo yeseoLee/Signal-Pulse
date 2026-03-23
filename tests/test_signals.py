@@ -2,91 +2,124 @@ from __future__ import annotations
 
 import pandas as pd
 
-from watchlist_signal_bot.models import SymbolConfig
-from watchlist_signal_bot.pipeline import build_indicator_frame
 from watchlist_signal_bot.signals import (
-    classify_state,
-    compute_indicator_scores,
-    compute_score,
-    evaluate_signals,
+    detect_support_resistance,
+    detect_trend,
+    format_price,
+    format_zone,
 )
 
-THRESHOLDS = {
-    "moving_average": {"short": 20, "medium": 60, "long": 120},
-    "breakout": {
-        "short_window": 20,
-        "medium_window": 60,
-        "long_window": 120,
-        "near_breakout_buffer": 0.98,
-    },
-    "volume": {"spike_ratio": 1.8},
-    "rsi": {"period": 14, "overbought": 70, "oversold": 30},
-    "score_weights": {
-        "breakout_20d": 10,
-        "breakout_60d": 20,
-        "golden_cross": 15,
-        "above_sma120": 10,
-        "rs_positive": 15,
-        "volume_confirmation": 10,
-        "dead_cross": -20,
-    },
-}
 
-
-def _breakout_frame() -> pd.DataFrame:
-    index = pd.bdate_range(start="2024-01-01", periods=260)
-    close = pd.Series(range(100, 360), index=index, dtype="float64")
-    close.iloc[-1] = close.iloc[-2] * 1.12
-    frame = pd.DataFrame(index=index)
-    frame["close"] = close
-    frame["open"] = close * 0.995
-    frame["high"] = close * 1.01
-    frame["low"] = close * 0.99
-    frame["adj_close"] = close
-    frame["volume"] = 1_000_000
-    frame.loc[frame.index[-1], "volume"] = 2_400_000
-    return frame
-
-
-def test_breakout_signal_scores_as_uptrend():
-    symbol = SymbolConfig(symbol="NVDA", market="US", name="NVIDIA", group="core_us")
-    prices = _breakout_frame()
-    benchmark = prices.copy()
-    benchmark["close"] = benchmark["close"] * 0.97
-
-    indicators = build_indicator_frame(prices, thresholds=THRESHOLDS, benchmark_frame=benchmark)
-    events, display_events, _ = evaluate_signals(indicators, symbol=symbol, thresholds=THRESHOLDS)
-    score = compute_score(indicators.iloc[-1], events=events, weights=THRESHOLDS["score_weights"])
-
-    codes = {event.code for event in display_events}
-    assert "BREAKOUT_60D" in codes
-    assert "VOLUME_CONFIRMED_BREAKOUT" in {event.code for event in events}
-    assert score >= 60
-    assert classify_state(score) in {"Uptrend", "Strong Uptrend"}
-
-
-def test_indicator_scores_capture_signal_buckets():
-    symbol = SymbolConfig(symbol="NVDA", market="US", name="NVIDIA", group="core_us")
-    prices = _breakout_frame()
-    benchmark = prices.copy()
-    benchmark["close"] = pd.Series(
-        [100 + index * 0.4 for index in range(len(benchmark))],
-        index=benchmark.index,
-        dtype="float64",
-    )
-    benchmark["open"] = benchmark["close"] * 0.995
-    benchmark["high"] = benchmark["close"] * 1.01
-    benchmark["low"] = benchmark["close"] * 0.99
-    benchmark["adj_close"] = benchmark["close"]
-
-    indicators = build_indicator_frame(prices, thresholds=THRESHOLDS, benchmark_frame=benchmark)
-    events, _, _ = evaluate_signals(indicators, symbol=symbol, thresholds=THRESHOLDS)
-    indicator_scores = compute_indicator_scores(
-        indicators.iloc[-1],
-        events=events,
-        weights=THRESHOLDS["score_weights"],
+def test_detect_trend_returns_uptrend_with_full_score():
+    frame = pd.DataFrame(
+        [
+            {
+                "close": 112.0,
+                "sma_fast": 108.0,
+                "sma_short": 106.0,
+                "sma_medium": 101.0,
+                "return_120d": 0.182,
+            }
+        ]
     )
 
-    assert indicator_scores["breakout"] > 0
-    assert indicator_scores["volume"] > 0
-    assert indicator_scores["relative_strength"] > 0
+    short_trend_label, medium_trend_label, long_trend_label, trend_label, trend_score = (
+        detect_trend(frame)
+    )
+
+    assert short_trend_label == "상승 추세"
+    assert medium_trend_label == "상승 추세"
+    assert long_trend_label == "상승 추세"
+    assert trend_label == "상승 추세"
+    assert trend_score == 3
+
+
+def test_detect_support_resistance_merges_nearby_pivots_into_zones():
+    index = pd.bdate_range(start="2024-01-01", periods=13)
+    frame = pd.DataFrame(
+        {
+            "open": [
+                100000,
+                101000,
+                104000,
+                101000,
+                100000,
+                100000,
+                105000,
+                100000,
+                100000,
+                99000,
+                104000,
+                100000,
+                101000,
+            ],
+            "high": [
+                100000,
+                103000,
+                106000,
+                103000,
+                100000,
+                104000,
+                108000,
+                104000,
+                100000,
+                103000,
+                107000,
+                103000,
+                100000,
+            ],
+            "low": [
+                100000,
+                98000,
+                95000,
+                98000,
+                100000,
+                97000,
+                94000,
+                97000,
+                100000,
+                96000,
+                95000,
+                97000,
+                101000,
+            ],
+            "close": [
+                100000,
+                100000,
+                104000,
+                100000,
+                99000,
+                100000,
+                106000,
+                100000,
+                99000,
+                100000,
+                105000,
+                100000,
+                99000,
+            ],
+            "volume": [1000] * 13,
+        },
+        index=index,
+    )
+
+    supports, resistances = detect_support_resistance(
+        frame,
+        current_price=99000.0,
+        lookback_days=13,
+        pivot_window=1,
+        merge_tolerance=0.02,
+        zone_width_ratio=0.01,
+        max_supports=2,
+        max_resistances=2,
+    )
+
+    assert len(supports) == 1
+    assert len(resistances) == 1
+    assert supports[0].touches == 3
+    assert resistances[0].touches == 3
+    assert format_zone(supports[0], market="KR") == "93,700~95,600원"
+    assert format_zone(resistances[0], market="US") == "$105,930.00~$108,070.00"
+    assert format_zone(supports[0], market="KR", asset_type="index") == "93,700~95,600"
+    assert format_price(265099.0, market="KR", asset_type="index") == "265,000"
+    assert format_price(5801.55, market="US", asset_type="index") == "5,801.55"

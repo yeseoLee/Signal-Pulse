@@ -6,7 +6,9 @@ from typing import Any
 
 import pandas as pd
 
-from watchlist_signal_bot.models import AnalysisResult
+from watchlist_signal_bot.models import AnalysisResult, PriceZone
+from watchlist_signal_bot.signals import format_zone, normalize_output_price
+from watchlist_signal_bot.utils.sorting import asset_priority
 
 
 class HistoryStore:
@@ -17,7 +19,8 @@ class HistoryStore:
 
     def write_daily_signals(self, results: list[AnalysisResult]) -> pd.DataFrame:
         daily_frame = pd.DataFrame([self._result_row(result) for result in results]).sort_values(
-            by=["score", "symbol"], ascending=[False, True]
+            by=["asset_priority", "trend_score", "symbol"],
+            ascending=[True, False, True],
         )
         daily_frame.to_csv(self.daily_csv, index=False)
         return daily_frame
@@ -29,11 +32,26 @@ class HistoryStore:
         else:
             combined = daily_frame.copy()
 
-        combined = combined.drop_duplicates(subset=["as_of", "symbol"], keep="last")
-        combined = combined.sort_values(by=["as_of", "symbol"]).reset_index(drop=True)
+        if "asset_type" not in combined.columns:
+            combined["asset_type"] = "equity"
+        combined["asset_type"] = combined["asset_type"].fillna("equity")
 
-        combined["previous_events"] = combined.groupby("symbol")["event_codes"].shift(1).fillna("")
-        combined["new_events"] = combined.apply(_find_new_events, axis=1)
+        if "asset_priority" not in combined.columns:
+            combined["asset_priority"] = combined["asset_type"].map(asset_priority)
+        combined["asset_priority"] = (
+            combined["asset_priority"]
+            .fillna(combined["asset_type"].map(asset_priority))
+            .astype(int)
+        )
+
+        combined = combined.drop_duplicates(subset=["as_of", "symbol"], keep="last")
+        combined = combined.sort_values(
+            by=["as_of", "asset_priority", "symbol"]
+        ).reset_index(drop=True)
+        combined["previous_trend_label"] = (
+            combined.groupby("symbol")["trend_label"].shift(1).fillna("")
+        )
+        combined["trend_change"] = combined.apply(_find_trend_change, axis=1)
         combined.to_csv(self.history_csv, index=False)
         return combined
 
@@ -43,26 +61,53 @@ class HistoryStore:
 
     @staticmethod
     def _result_row(result: AnalysisResult) -> dict[str, Any]:
-        events = [event.code for event in result.display_events]
         return {
             "as_of": result.as_of.isoformat(),
             "symbol": result.config.symbol,
             "name": result.config.name,
             "market": result.config.market,
             "group": result.config.group,
-            "benchmark": result.config.benchmark_label or result.config.benchmark,
-            "price": round(result.price, 4),
-            "score": result.score,
-            "confidence": result.confidence,
-            "state": result.state,
+            "asset_type": result.config.asset_type,
+            "asset_priority": asset_priority(result.config.asset_type),
+            "price": normalize_output_price(result.price, market=result.config.market),
+            "short_trend_label": result.short_trend_label,
+            "medium_trend_label": result.medium_trend_label,
+            "long_trend_label": result.long_trend_label,
+            "trend_label": result.trend_label,
+            "trend_score": result.trend_score,
+            "return_20d": result.indicators.get("return_20d"),
+            "return_60d": result.indicators.get("return_60d"),
+            "return_120d": result.indicators.get("return_120d"),
+            "supports": ";".join(
+                _zone_label(
+                    result.support_zones,
+                    market=result.config.market,
+                    asset_type=result.config.asset_type,
+                )
+            ),
+            "resistances": ";".join(
+                _zone_label(
+                    result.resistance_zones,
+                    market=result.config.market,
+                    asset_type=result.config.asset_type,
+                )
+            ),
+            "trend_summary": result.trend_summary,
+            "support_summary": result.support_summary,
+            "resistance_summary": result.resistance_summary,
             "source": result.source,
             "data_quality": result.data_quality,
-            "event_codes": ";".join(events),
             "fetched_at": result.fetched_at.isoformat() if result.fetched_at else "",
         }
 
 
-def _find_new_events(row: pd.Series) -> str:
-    current = {item for item in str(row["event_codes"]).split(";") if item}
-    previous = {item for item in str(row["previous_events"]).split(";") if item}
-    return ";".join(sorted(current - previous))
+def _find_trend_change(row: pd.Series) -> str:
+    previous = str(row.get("previous_trend_label", "")).strip()
+    current = str(row.get("trend_label", "")).strip()
+    if not previous or previous == current:
+        return ""
+    return f"{previous} -> {current}"
+
+
+def _zone_label(zones: list[PriceZone], *, market: str, asset_type: str) -> list[str]:
+    return [format_zone(zone, market=market, asset_type=asset_type) for zone in zones]
