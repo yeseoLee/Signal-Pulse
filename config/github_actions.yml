@@ -1,7 +1,6 @@
 daily:
   schedule:
-    - "35 7 * * 1-5"
-    - "35 22 * * 1-5"
+    - "0 0 * * 0"
   options:
     market:
       default: ALL
