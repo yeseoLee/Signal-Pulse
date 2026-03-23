@@ -1,0 +1,682 @@
+{
+  "summary": {
+    "success_count": 8,
+    "failure_count": 0
+  },
+  "failures": {},
+  "reports": [
+    {
+      "symbol": "S&P500",
+      "name": "S&P500",
+      "market": "US",
+      "group": "core_us",
+      "asset_type": "index",
+      "asset_priority": 0,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "하락 추세",
+      "mid_long_trend_label": "하락 추세",
+      "long_trend_label": "횡보",
+      "trend_label": "하락 추세",
+      "trend_score": -3,
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "supports": [],
+      "resistances": [
+        {
+          "lower": 6691.8455419921875,
+          "upper": 6827.0343408203125,
+          "center": 6759.43994140625,
+          "touches": 2
+        },
+        {
+          "lower": 6882.387563476563,
+          "upper": 7021.425696072049,
+          "center": 6951.906629774306,
+          "touches": 9
+        }
+      ],
+      "trend_summary": "중장기 하락 우위가 이어지고 있으며 장기 구조도 전반적으로 약합니다.",
+      "support_summary": "현재가 아래에서 뚜렷한 지지 가격대는 아직 제한적입니다.",
+      "resistance_summary": "상단에서는 6,691.85~6,827.03 구간과 6,882.39~7,021.43 구간이 주요 저항대로 보입니다.",
+      "indicators": {
+        "close": 6506.47998046875,
+        "sma5": 6630.62802734375,
+        "sma20": 6770.569482421875,
+        "sma60": 6865.561987304687,
+        "sma120": 6813.570235188802,
+        "return_20d": -5.832972219843069,
+        "return_60d": -5.4083125981213565,
+        "return_120d": -2.065418528978269,
+        "data_points": 575
+      }
+    },
+    {
+      "symbol": "GOOGL",
+      "name": "Alphabet Class A",
+      "market": "US",
+      "group": "core_us",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "횡보",
+      "mid_long_trend_label": "하락 추세",
+      "long_trend_label": "횡보",
+      "trend_label": "하락 추세",
+      "trend_score": -2,
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "supports": [
+        {
+          "lower": 297.4356024169922,
+          "upper": 303.4444024658203,
+          "center": 300.44000244140625,
+          "touches": 1
+        },
+        {
+          "lower": 292.5284939575195,
+          "upper": 298.43816050211586,
+          "center": 295.4833272298177,
+          "touches": 3
+        }
+      ],
+      "resistances": [
+        {
+          "lower": 308.30581329345705,
+          "upper": 314.5342135620117,
+          "center": 311.4200134277344,
+          "touches": 1
+        },
+        {
+          "lower": 316.32478912353514,
+          "upper": 322.7151889038086,
+          "center": 319.5199890136719,
+          "touches": 1
+        }
+      ],
+      "trend_summary": "중장기 하락 우위가 이어지지만 단기 또는 중단기는 반등 또는 정체 구간입니다.",
+      "support_summary": "하단에서는 $297.44~$303.44 구간과 $292.53~$298.44 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 $308.31~$314.53 구간과 $316.32~$322.72 구간이 주요 저항대로 보입니다.",
+      "indicators": {
+        "close": 301.0,
+        "sma5": 306.4600036621094,
+        "sma20": 306.3644989013672,
+        "sma60": 317.4891662597656,
+        "sma120": 299.5074998219808,
+        "return_20d": -4.438380372948469,
+        "return_60d": -2.8342690986812857,
+        "return_120d": 22.08972507379816,
+        "data_points": 575
+      }
+    },
+    {
+      "symbol": "AAPL",
+      "name": "Apple",
+      "market": "US",
+      "group": "core_us",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "하락 추세",
+      "mid_long_trend_label": "하락 추세",
+      "long_trend_label": "하락 추세",
+      "trend_label": "하락 추세",
+      "trend_score": -4,
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "supports": [
+        {
+          "lower": 241.27289909362793,
+          "upper": 246.14709907531739,
+          "center": 243.70999908447266,
+          "touches": 2
+        }
+      ],
+      "resistances": [
+        {
+          "lower": 258.7587801361084,
+          "upper": 263.9862302398682,
+          "center": 261.3725051879883,
+          "touches": 4
+        },
+        {
+          "lower": 262.63710845947264,
+          "upper": 267.9429086303711,
+          "center": 265.2900085449219,
+          "touches": 1
+        }
+      ],
+      "trend_summary": "단기부터 장기까지 하락 구조가 이어지고 있습니다.",
+      "support_summary": "하단에서는 $241.27~$246.15 구간이 1차 지지로 해석됩니다.",
+      "resistance_summary": "상단에서는 $258.76~$263.99 구간과 $262.64~$267.94 구간이 주요 저항대로 보입니다.",
+      "indicators": {
+        "close": 247.99000549316406,
+        "sma5": 250.78800354003906,
+        "sma20": 259.9880004882813,
+        "sma60": 262.5954986572266,
+        "sma120": 265.0626658121745,
+        "return_20d": -6.270308383499101,
+        "return_60d": -8.480641998751004,
+        "return_120d": -2.9241372521648934,
+        "data_points": 575
+      }
+    },
+    {
+      "symbol": "NVDA",
+      "name": "NVIDIA",
+      "market": "US",
+      "group": "core_us",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "하락 추세",
+      "mid_long_trend_label": "하락 추세",
+      "long_trend_label": "하락 추세",
+      "trend_label": "하락 추세",
+      "trend_score": -4,
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "supports": [
+        {
+          "lower": 168.593699798584,
+          "upper": 171.9996331278483,
+          "center": 170.29666646321616,
+          "touches": 3
+        }
+      ],
+      "resistances": [
+        {
+          "lower": 183.33479919433594,
+          "upper": 187.03853251139324,
+          "center": 185.1866658528646,
+          "touches": 3
+        },
+        {
+          "lower": 186.55560241699217,
+          "upper": 190.32440246582033,
+          "center": 188.44000244140625,
+          "touches": 2
+        }
+      ],
+      "trend_summary": "단기부터 장기까지 하락 구조가 이어지고 있습니다.",
+      "support_summary": "하단에서는 $168.59~$172.00 구간이 1차 지지로 해석됩니다.",
+      "resistance_summary": "상단에서는 $183.33~$187.04 구간과 $186.56~$190.32 구간이 주요 저항대로 보입니다.",
+      "indicators": {
+        "close": 172.92999267578125,
+        "sma5": 179.40799560546876,
+        "sma20": 183.13249893188475,
+        "sma60": 185.23633321126303,
+        "sma120": 185.54075050354004,
+        "return_20d": -8.897910650476803,
+        "return_60d": -5.857700268177224,
+        "return_120d": -2.9519107096676933,
+        "data_points": 575
+      }
+    },
+    {
+      "symbol": "KOSPI",
+      "name": "KOSPI",
+      "market": "KR",
+      "group": "core_kr",
+      "asset_type": "index",
+      "asset_priority": 0,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "횡보",
+      "mid_long_trend_label": "횡보",
+      "long_trend_label": "상승 추세",
+      "trend_label": "횡보",
+      "trend_score": 0,
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "supports": [
+        {
+          "lower": 5300.0,
+          "upper": 5400.0,
+          "center": 5300.0,
+          "touches": 1
+        },
+        {
+          "lower": 5000.0,
+          "upper": 5100.0,
+          "center": 5000.0,
+          "touches": 1
+        }
+      ],
+      "resistances": [
+        {
+          "lower": 5600.0,
+          "upper": 5800.0,
+          "center": 5700.0,
+          "touches": 1
+        },
+        {
+          "lower": 5800.0,
+          "upper": 5900.0,
+          "center": 5900.0,
+          "touches": 1
+        }
+      ],
+      "trend_summary": "단기부터 장기까지 방향이 엇갈리며, 기준 추세는 중장기 기준 횡보입니다.",
+      "support_summary": "하단에서는 5,300~5,400 구간과 5,000~5,100 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 5,600~5,800 구간과 5,800~5,900 구간이 주요 저항대로 보입니다.",
+      "indicators": {
+        "close": 5405.75,
+        "sma5": 5703.136,
+        "sma20": 5701.782,
+        "sma60": 5137.305166666667,
+        "sma120": 4512.994333333334,
+        "return_20d": -6.934284578025762,
+        "return_60d": 35.32948972464707,
+        "return_120d": 56.17686996215294,
+        "data_points": 557
+      }
+    },
+    {
+      "symbol": "000660",
+      "name": "SK하이닉스",
+      "market": "KR",
+      "group": "core_kr",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "횡보",
+      "mid_long_trend_label": "횡보",
+      "long_trend_label": "상승 추세",
+      "trend_label": "횡보",
+      "trend_score": 0,
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "supports": [
+        {
+          "lower": 875100.0,
+          "upper": 892800.0,
+          "center": 884000.0,
+          "touches": 1
+        },
+        {
+          "lower": 799900.0,
+          "upper": 816000.0,
+          "center": 808000.0,
+          "touches": 1
+        }
+      ],
+      "resistances": [
+        {
+          "lower": 975100.0,
+          "upper": 994800.0,
+          "center": 985000.0,
+          "touches": 1
+        },
+        {
+          "lower": 1049400.0,
+          "upper": 1070600.0,
+          "center": 1060000.0,
+          "touches": 1
+        }
+      ],
+      "trend_summary": "단기부터 장기까지 방향이 엇갈리며, 기준 추세는 중장기 기준 횡보입니다.",
+      "support_summary": "하단에서는 875,100~892,800원 구간과 799,900~816,000원 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 975,100~994,800원 구간과 1,049,400~1,070,600원 구간이 주요 저항대로 보입니다.",
+      "indicators": {
+        "close": 933000.0,
+        "sma5": 995800.0,
+        "sma20": 965450.0,
+        "sma60": 834016.6666666666,
+        "sma120": 671708.3333333334,
+        "return_20d": -1.6859852476290849,
+        "return_60d": 69.0217391304348,
+        "return_120d": 164.3059490084986,
+        "data_points": 557
+      }
+    },
+    {
+      "symbol": "005930",
+      "name": "삼성전자",
+      "market": "KR",
+      "group": "core_kr",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "횡보",
+      "mid_long_trend_label": "횡보",
+      "long_trend_label": "상승 추세",
+      "trend_label": "횡보",
+      "trend_score": 0,
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "supports": [
+        {
+          "lower": 178100.0,
+          "upper": 181600.0,
+          "center": 179900.0,
+          "touches": 1
+        },
+        {
+          "lower": 165600.0,
+          "upper": 168900.0,
+          "center": 167300.0,
+          "touches": 1
+        }
+      ],
+      "resistances": [
+        {
+          "lower": 192800.0,
+          "upper": 196700.0,
+          "center": 194800.0,
+          "touches": 1
+        },
+        {
+          "lower": 206900.0,
+          "upper": 211000.0,
+          "center": 209000.0,
+          "touches": 1
+        }
+      ],
+      "trend_summary": "단기부터 장기까지 방향이 엇갈리며, 기준 추세는 중장기 기준 횡보입니다.",
+      "support_summary": "하단에서는 178,100~181,600원 구간과 165,600~168,900원 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 192,800~196,700원 구간과 206,900~211,000원 구간이 주요 저항대로 보입니다.",
+      "indicators": {
+        "close": 186300.0,
+        "sma5": 197720.0,
+        "sma20": 193910.0,
+        "sma60": 163270.0,
+        "sma120": 130970.0,
+        "return_20d": -1.9989479221462436,
+        "return_60d": 73.14126394052045,
+        "return_120d": 131.42857142857144,
+        "data_points": 557
+      }
+    },
+    {
+      "symbol": "005380",
+      "name": "현대차",
+      "market": "KR",
+      "group": "core_kr",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "하락 추세",
+      "mid_long_trend_label": "횡보",
+      "long_trend_label": "상승 추세",
+      "trend_label": "횡보",
+      "trend_score": -1,
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "supports": [
+        {
+          "lower": 464300.0,
+          "upper": 473600.0,
+          "center": 469000.0,
+          "touches": 1
+        },
+        {
+          "lower": 447400.0,
+          "upper": 456500.0,
+          "center": 452000.0,
+          "touches": 1
+        }
+      ],
+      "resistances": [
+        {
+          "lower": 512800.0,
+          "upper": 523100.0,
+          "center": 518000.0,
+          "touches": 1
+        },
+        {
+          "lower": 523700.0,
+          "upper": 534200.0,
+          "center": 529000.0,
+          "touches": 1
+        }
+      ],
+      "trend_summary": "기간별 방향은 엇갈리지만 전체적으로는 하방 우세 속에서 중장기 기준 횡보가 이어지고 있습니다.",
+      "support_summary": "하단에서는 464,300~473,600원 구간과 447,400~456,500원 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 512,800~523,100원 구간과 523,700~534,200원 구간이 주요 저항대로 보입니다.",
+      "indicators": {
+        "close": 485000.0,
+        "sma5": 518200.0,
+        "sma20": 539800.0,
+        "sma60": 463091.6666666667,
+        "sma120": 360979.1666666667,
+        "return_20d": -4.715127701375243,
+        "return_60d": 71.68141592920354,
+        "return_120d": 121.9679633867277,
+        "data_points": 557
+      }
+    }
+  ],
+  "history_tail": [
+    {
+      "as_of": "2026-03-20",
+      "symbol": "S&P500",
+      "name": "S&P500",
+      "market": "US",
+      "group": "core_us",
+      "asset_type": "index",
+      "asset_priority": 0,
+      "price": 6506.4799804688,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "하락 추세",
+      "mid_long_trend_label": "하락 추세",
+      "long_trend_label": "횡보",
+      "trend_label": "하락 추세",
+      "trend_score": -3,
+      "return_20d": -5.8329722198,
+      "return_60d": -5.4083125981,
+      "return_120d": -2.065418529,
+      "supports": "",
+      "resistances": "6,691.85~6,827.03;6,882.39~7,021.43",
+      "trend_summary": "중장기 하락 우위가 이어지고 있으며 장기 구조도 전반적으로 약합니다.",
+      "support_summary": "현재가 아래에서 뚜렷한 지지 가격대는 아직 제한적입니다.",
+      "resistance_summary": "상단에서는 6,691.85~6,827.03 구간과 6,882.39~7,021.43 구간이 주요 저항대로 보입니다.",
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "fetched_at": "2026-03-23T07:16:30.245265",
+      "previous_trend_label": "",
+      "trend_change": ""
+    },
+    {
+      "as_of": "2026-03-20",
+      "symbol": "AAPL",
+      "name": "Apple",
+      "market": "US",
+      "group": "core_us",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "price": 247.9900054932,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "하락 추세",
+      "mid_long_trend_label": "하락 추세",
+      "long_trend_label": "하락 추세",
+      "trend_label": "하락 추세",
+      "trend_score": -4,
+      "return_20d": -6.2703083835,
+      "return_60d": -8.4806419988,
+      "return_120d": -2.9241372522,
+      "supports": "$241.27~$246.15",
+      "resistances": "$258.76~$263.99;$262.64~$267.94",
+      "trend_summary": "단기부터 장기까지 하락 구조가 이어지고 있습니다.",
+      "support_summary": "하단에서는 $241.27~$246.15 구간이 1차 지지로 해석됩니다.",
+      "resistance_summary": "상단에서는 $258.76~$263.99 구간과 $262.64~$267.94 구간이 주요 저항대로 보입니다.",
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "fetched_at": "2026-03-23T07:16:29.794541",
+      "previous_trend_label": "",
+      "trend_change": ""
+    },
+    {
+      "as_of": "2026-03-20",
+      "symbol": "GOOGL",
+      "name": "Alphabet Class A",
+      "market": "US",
+      "group": "core_us",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "price": 301.0,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "횡보",
+      "mid_long_trend_label": "하락 추세",
+      "long_trend_label": "횡보",
+      "trend_label": "하락 추세",
+      "trend_score": -2,
+      "return_20d": -4.4383803729,
+      "return_60d": -2.8342690987,
+      "return_120d": 22.0897250738,
+      "supports": "$297.44~$303.44;$292.53~$298.44",
+      "resistances": "$308.31~$314.53;$316.32~$322.72",
+      "trend_summary": "중장기 하락 우위가 이어지지만 단기 또는 중단기는 반등 또는 정체 구간입니다.",
+      "support_summary": "하단에서는 $297.44~$303.44 구간과 $292.53~$298.44 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 $308.31~$314.53 구간과 $316.32~$322.72 구간이 주요 저항대로 보입니다.",
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "fetched_at": "2026-03-23T07:16:30.138697",
+      "previous_trend_label": "",
+      "trend_change": ""
+    },
+    {
+      "as_of": "2026-03-20",
+      "symbol": "NVDA",
+      "name": "NVIDIA",
+      "market": "US",
+      "group": "core_us",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "price": 172.9299926758,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "하락 추세",
+      "mid_long_trend_label": "하락 추세",
+      "long_trend_label": "하락 추세",
+      "trend_label": "하락 추세",
+      "trend_score": -4,
+      "return_20d": -8.8979106505,
+      "return_60d": -5.8577002682,
+      "return_120d": -2.9519107097,
+      "supports": "$168.59~$172.00",
+      "resistances": "$183.33~$187.04;$186.56~$190.32",
+      "trend_summary": "단기부터 장기까지 하락 구조가 이어지고 있습니다.",
+      "support_summary": "하단에서는 $168.59~$172.00 구간이 1차 지지로 해석됩니다.",
+      "resistance_summary": "상단에서는 $183.33~$187.04 구간과 $186.56~$190.32 구간이 주요 저항대로 보입니다.",
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "fetched_at": "2026-03-23T07:16:29.944174",
+      "previous_trend_label": "",
+      "trend_change": ""
+    },
+    {
+      "as_of": "2026-03-23",
+      "symbol": "KOSPI",
+      "name": "KOSPI",
+      "market": "KR",
+      "group": "core_kr",
+      "asset_type": "index",
+      "asset_priority": 0,
+      "price": 5400.0,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "횡보",
+      "mid_long_trend_label": "횡보",
+      "long_trend_label": "상승 추세",
+      "trend_label": "횡보",
+      "trend_score": 0,
+      "return_20d": -6.934284578,
+      "return_60d": 35.3294897246,
+      "return_120d": 56.1768699622,
+      "supports": "5,300~5,400;5,000~5,100",
+      "resistances": "5,600~5,800;5,800~5,900",
+      "trend_summary": "단기부터 장기까지 방향이 엇갈리며, 기준 추세는 중장기 기준 횡보입니다.",
+      "support_summary": "하단에서는 5,300~5,400 구간과 5,000~5,100 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 5,600~5,800 구간과 5,800~5,900 구간이 주요 저항대로 보입니다.",
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "fetched_at": "2026-03-23T07:16:29.587598",
+      "previous_trend_label": "",
+      "trend_change": ""
+    },
+    {
+      "as_of": "2026-03-23",
+      "symbol": "000660",
+      "name": "SK하이닉스",
+      "market": "KR",
+      "group": "core_kr",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "price": 933000.0,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "횡보",
+      "mid_long_trend_label": "횡보",
+      "long_trend_label": "상승 추세",
+      "trend_label": "횡보",
+      "trend_score": 0,
+      "return_20d": -1.6859852476,
+      "return_60d": 69.0217391304,
+      "return_120d": 164.3059490085,
+      "supports": "875,100~892,800원;799,900~816,000원",
+      "resistances": "975,100~994,800원;1,049,400~1,070,600원",
+      "trend_summary": "단기부터 장기까지 방향이 엇갈리며, 기준 추세는 중장기 기준 횡보입니다.",
+      "support_summary": "하단에서는 875,100~892,800원 구간과 799,900~816,000원 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 975,100~994,800원 구간과 1,049,400~1,070,600원 구간이 주요 저항대로 보입니다.",
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "fetched_at": "2026-03-23T07:16:27.199335",
+      "previous_trend_label": "",
+      "trend_change": ""
+    },
+    {
+      "as_of": "2026-03-23",
+      "symbol": "005380",
+      "name": "현대차",
+      "market": "KR",
+      "group": "core_kr",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "price": 485000.0,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "하락 추세",
+      "mid_long_trend_label": "횡보",
+      "long_trend_label": "상승 추세",
+      "trend_label": "횡보",
+      "trend_score": -1,
+      "return_20d": -4.7151277014,
+      "return_60d": 71.6814159292,
+      "return_120d": 121.9679633867,
+      "supports": "464,300~473,600원;447,400~456,500원",
+      "resistances": "512,800~523,100원;523,700~534,200원",
+      "trend_summary": "기간별 방향은 엇갈리지만 전체적으로는 하방 우세 속에서 중장기 기준 횡보가 이어지고 있습니다.",
+      "support_summary": "하단에서는 464,300~473,600원 구간과 447,400~456,500원 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 512,800~523,100원 구간과 523,700~534,200원 구간이 주요 저항대로 보입니다.",
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "fetched_at": "2026-03-23T07:16:28.400711",
+      "previous_trend_label": "",
+      "trend_change": ""
+    },
+    {
+      "as_of": "2026-03-23",
+      "symbol": "005930",
+      "name": "삼성전자",
+      "market": "KR",
+      "group": "core_kr",
+      "asset_type": "equity",
+      "asset_priority": 1,
+      "price": 186300.0,
+      "short_trend_label": "하락 추세",
+      "medium_trend_label": "횡보",
+      "mid_long_trend_label": "횡보",
+      "long_trend_label": "상승 추세",
+      "trend_label": "횡보",
+      "trend_score": 0,
+      "return_20d": -1.9989479221,
+      "return_60d": 73.1412639405,
+      "return_120d": 131.4285714286,
+      "supports": "178,100~181,600원;165,600~168,900원",
+      "resistances": "192,800~196,700원;206,900~211,000원",
+      "trend_summary": "단기부터 장기까지 방향이 엇갈리며, 기준 추세는 중장기 기준 횡보입니다.",
+      "support_summary": "하단에서는 178,100~181,600원 구간과 165,600~168,900원 구간이 주요 지지대로 보입니다.",
+      "resistance_summary": "상단에서는 192,800~196,700원 구간과 206,900~211,000원 구간이 주요 저항대로 보입니다.",
+      "source": "FinanceDataReader",
+      "data_quality": "fresh",
+      "fetched_at": "2026-03-23T07:16:24.709972",
+      "previous_trend_label": "",
+      "trend_change": ""
+    }
+  ]
+}
