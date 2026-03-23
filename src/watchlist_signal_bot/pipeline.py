@@ -109,9 +109,14 @@ def analyze_symbol(
         thresholds=thresholds,
     )
     latest = indicator_frame.iloc[-1]
-    short_trend_label, medium_trend_label, long_trend_label, trend_label, trend_score = (
-        detect_trend(indicator_frame)
-    )
+    (
+        short_trend_label,
+        medium_trend_label,
+        mid_long_trend_label,
+        long_trend_label,
+        trend_label,
+        trend_score,
+    ) = detect_trend(indicator_frame)
 
     levels_cfg = thresholds["levels"]
     supports, resistances = detect_support_resistance(
@@ -133,6 +138,7 @@ def analyze_symbol(
         indicator_frame,
         short_trend_label=short_trend_label,
         medium_trend_label=medium_trend_label,
+        mid_long_trend_label=mid_long_trend_label,
         long_trend_label=long_trend_label,
         trend_label=trend_label,
     )
@@ -159,6 +165,7 @@ def analyze_symbol(
             "sma5": _maybe_float(latest.get("sma_fast")),
             "sma20": _maybe_float(latest.get("sma_short")),
             "sma60": _maybe_float(latest.get("sma_medium")),
+            "sma120": _maybe_float(latest.get("sma_long")),
             "return_20d": return_20d,
             "return_60d": return_60d,
             "return_120d": return_120d,
@@ -166,6 +173,7 @@ def analyze_symbol(
         },
         short_trend_label=short_trend_label,
         medium_trend_label=medium_trend_label,
+        mid_long_trend_label=mid_long_trend_label,
         long_trend_label=long_trend_label,
         trend_label=trend_label,
         trend_score=trend_score,

@@ -18,20 +18,26 @@ def test_detect_trend_returns_uptrend_with_full_score():
                 "sma_fast": 108.0,
                 "sma_short": 106.0,
                 "sma_medium": 101.0,
-                "return_120d": 0.182,
+                "sma_long": 96.0,
             }
         ]
     )
 
-    short_trend_label, medium_trend_label, long_trend_label, trend_label, trend_score = (
-        detect_trend(frame)
-    )
+    (
+        short_trend_label,
+        medium_trend_label,
+        mid_long_trend_label,
+        long_trend_label,
+        trend_label,
+        trend_score,
+    ) = detect_trend(frame)
 
     assert short_trend_label == "상승 추세"
     assert medium_trend_label == "상승 추세"
+    assert mid_long_trend_label == "상승 추세"
     assert long_trend_label == "상승 추세"
     assert trend_label == "상승 추세"
-    assert trend_score == 3
+    assert trend_score == 4
 
 
 def test_detect_support_resistance_merges_nearby_pivots_into_zones():

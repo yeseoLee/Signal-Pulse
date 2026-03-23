@@ -72,6 +72,7 @@ class HistoryStore:
             "price": normalize_output_price(result.price, market=result.config.market),
             "short_trend_label": result.short_trend_label,
             "medium_trend_label": result.medium_trend_label,
+            "mid_long_trend_label": result.mid_long_trend_label,
             "long_trend_label": result.long_trend_label,
             "trend_label": result.trend_label,
             "trend_score": result.trend_score,

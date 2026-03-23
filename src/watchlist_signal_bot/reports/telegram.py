@@ -100,16 +100,10 @@ def _result_lines(index: int, result: AnalysisResult) -> list[str]:
     return [
         f"{index}. {result.config.symbol} ({result.config.name})",
         f"   - 현재가: {price_label}",
-        "   - 추세 구간: "
-        f"단기 {result.short_trend_label} / "
-        f"중기 {result.medium_trend_label} / "
-        f"장기 {result.long_trend_label}",
         f"   - 추세: {result.trend_summary}",
         f"   - 수익률: 20일 {_fmt_percent(result.indicators.get('return_20d'))} / "
         f"60일 {_fmt_percent(result.indicators.get('return_60d'))} / "
         f"120일 {_fmt_percent(result.indicators.get('return_120d'))}",
-        f"   - 지지: {result.support_summary}",
-        f"   - 저항: {result.resistance_summary}",
     ]
 
 

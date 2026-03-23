@@ -5,12 +5,12 @@
 - [한국어](./README.md)
 - English
 
-This bot generates Telegram and HTML reports from a watchlist using **5-day / 20-day / 60-day moving-average trend detection**, **pivot-based support and resistance zones**, and **20-day / 60-day / 120-day returns**.
+This bot generates Telegram and HTML reports from a watchlist using **5-day / 20-day / 60-day / 120-day moving-average trend detection**, **pivot-based support and resistance zones**, and **20-day / 60-day / 120-day returns**.
 
 ## Overview
 
-- Trend is split into `short-term`, `medium-term`, and `long-term` states using `MA5`, `MA20`, and `MA60`.
-- The report uses the `medium-term (20/60)` trend as the primary section label.
+- Trend is split into `short-term`, `short-to-mid-term`, `mid-to-long-term`, and `long-term` states using `MA5`, `MA20`, `MA60`, and `MA120`.
+- The report uses the `mid-to-long-term (20/60)` trend as the primary section label.
 - Support and resistance are derived from pivot highs and lows, then merged into simple price zones.
 - The report always includes `20-day`, `60-day`, and `120-day` returns.
 - Outputs are written as `CSV`, `JSON`, `HTML`, and `Telegram text`.
@@ -60,6 +60,7 @@ Defines the core technical-report parameters.
 - `moving_average.fast`: default 5-day average
 - `moving_average.short`: default 20-day average
 - `moving_average.medium`: default 60-day average
+- `moving_average.long`: default 120-day average
 - `returns.windows`: default return windows
 - `levels.lookback_days`: trailing candles used for support/resistance detection
 - `levels.pivot_window`: pivot high/low window
@@ -86,10 +87,11 @@ make check-workflows
 
 ### 1. Trend
 
-- Short-term: `close > MA5 > MA20` => `uptrend`, `close < MA5 < MA20` => `downtrend`, otherwise `sideways`
-- Medium-term: `close > MA20 > MA60` => `uptrend`, `close < MA20 < MA60` => `downtrend`, otherwise `sideways`
-- Long-term: `close > MA60` with positive `120-day return` => `uptrend`, `close < MA60` with negative `120-day return` => `downtrend`, otherwise `sideways`
-- The primary report label and trend-change tracking use the medium-term trend.
+- Short-term: `close > MA5` => `uptrend`, `close < MA5` => `downtrend`, otherwise `sideways`
+- Short-to-mid-term: `close > MA5 > MA20` => `uptrend`, `close < MA5 < MA20` => `downtrend`, otherwise `sideways`
+- Mid-to-long-term: `close > MA20 > MA60` => `uptrend`, `close < MA20 < MA60` => `downtrend`, otherwise `sideways`
+- Long-term: `close > MA60 > MA120` => `uptrend`, `close < MA60 < MA120` => `downtrend`, otherwise `sideways`
+- The primary report label and trend-change tracking use the mid-to-long-term trend.
 
 ### 2. Returns
 
@@ -120,14 +122,14 @@ Each symbol gets:
 ### Telegram
 
 - Split into `uptrend`, `sideways`, and `downtrend` sections
-- Show short/medium/long trend states, 20/60/120-day returns, support, and resistance per symbol
+- Show only the current price, trend summary, and 20/60/120-day returns per symbol
 - Append the GitHub Pages report link at the bottom
 
 ### HTML
 
 - Trend distribution summary
 - Recent trend changes
-- Per-symbol cards with short/medium/long trend badges
+- Per-symbol cards with short/short-mid/mid-long/long trend badges
 - Support/resistance zones
 - Failed symbols section
 
@@ -149,7 +151,7 @@ If Telegram credentials are missing, the app only writes local artifacts.
 
 ## Developer Docs
 
-- Signal and function map: [`docs/developer-signals.md`](./docs/developer-signals.md)
+- Signal and function map: [`docs/signals.md`](./docs/signals.md)
 
 ## Development Commands
 

@@ -154,6 +154,7 @@ def build_report_payload(*, analyses, failures, history_frame):
                 "asset_priority": asset_priority(item.config.asset_type),
                 "short_trend_label": item.short_trend_label,
                 "medium_trend_label": item.medium_trend_label,
+                "mid_long_trend_label": item.mid_long_trend_label,
                 "long_trend_label": item.long_trend_label,
                 "trend_label": item.trend_label,
                 "trend_score": item.trend_score,

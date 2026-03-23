@@ -9,24 +9,33 @@ import pandas as pd
 from watchlist_signal_bot.models import PriceZone
 
 
-def detect_trend(frame: pd.DataFrame) -> tuple[str, str, str, str, int]:
+def detect_trend(frame: pd.DataFrame) -> tuple[str, str, str, str, str, int]:
     latest = frame.iloc[-1]
     close = latest.get("close")
     sma5 = latest.get("sma_fast")
     sma20 = latest.get("sma_short")
     sma60 = latest.get("sma_medium")
-    return_120d = latest.get("return_120d")
+    sma120 = latest.get("sma_long")
 
-    short_trend_label = _classify_alignment(close=close, fast=sma5, slow=sma20)
-    medium_trend_label = _classify_alignment(close=close, fast=sma20, slow=sma60)
-    long_trend_label = _classify_long_term(close=close, sma60=sma60, return_120d=return_120d)
-    trend_label = medium_trend_label
+    short_trend_label = _classify_price_vs_average(close=close, average=sma5)
+    medium_trend_label = _classify_alignment(close=close, fast=sma5, slow=sma20)
+    mid_long_trend_label = _classify_alignment(close=close, fast=sma20, slow=sma60)
+    long_trend_label = _classify_alignment(close=close, fast=sma60, slow=sma120)
+    trend_label = mid_long_trend_label
     trend_score = (
         _trend_points(short_trend_label)
         + _trend_points(medium_trend_label)
+        + _trend_points(mid_long_trend_label)
         + _trend_points(long_trend_label)
     )
-    return short_trend_label, medium_trend_label, long_trend_label, trend_label, trend_score
+    return (
+        short_trend_label,
+        medium_trend_label,
+        mid_long_trend_label,
+        long_trend_label,
+        trend_label,
+        trend_score,
+    )
 
 
 def find_pivot_highs(frame: pd.DataFrame, *, window: int = 3) -> list[tuple[pd.Timestamp, float]]:
@@ -146,6 +155,7 @@ def summarize_trend(
     *,
     short_trend_label: str,
     medium_trend_label: str,
+    mid_long_trend_label: str,
     long_trend_label: str,
     trend_label: str,
 ) -> str:
@@ -153,41 +163,59 @@ def summarize_trend(
     sma5 = latest.get("sma_fast")
     sma20 = latest.get("sma_short")
     sma60 = latest.get("sma_medium")
+    sma120 = latest.get("sma_long")
 
-    if pd.isna(sma5) or pd.isna(sma20) or pd.isna(sma60):
-        return "이동평균 데이터가 충분하지 않아 단기·중기·장기 추세 판단이 제한적입니다."
+    if pd.isna(sma5) or pd.isna(sma20) or pd.isna(sma60) or pd.isna(sma120):
+        return "이동평균 데이터가 충분하지 않아 단기·중단기·중장기·장기 추세 판단이 제한적입니다."
 
-    if short_trend_label == medium_trend_label == long_trend_label == "상승 추세":
-        return "단기부터 장기까지 상승 구조가 비교적 고르게 정렬돼 있습니다."
-    if short_trend_label == medium_trend_label == long_trend_label == "하락 추세":
+    labels = (
+        short_trend_label,
+        medium_trend_label,
+        mid_long_trend_label,
+        long_trend_label,
+    )
+
+    if labels == ("상승 추세", "상승 추세", "상승 추세", "상승 추세"):
+        return "단기부터 장기까지 상승 구조가 고르게 정렬돼 있습니다."
+    if labels == ("하락 추세", "하락 추세", "하락 추세", "하락 추세"):
         return "단기부터 장기까지 하락 구조가 이어지고 있습니다."
+    if labels == ("횡보", "횡보", "횡보", "횡보"):
+        return "단기부터 장기까지 뚜렷한 방향성 없이 횡보 구간에 머물러 있습니다."
 
-    if medium_trend_label == "상승 추세":
-        if short_trend_label == "하락 추세":
+    if trend_label == "상승 추세":
+        if short_trend_label == "하락 추세" or medium_trend_label == "하락 추세":
             return (
-                "중기 상승 추세 안에서 단기 조정이 나타났지만 "
+                "중장기 상승 추세 안에서 단기 또는 중단기 조정이 나타났지만 "
                 "구조 자체는 아직 유지되고 있습니다."
             )
-        if short_trend_label == "횡보":
-            return "중기 상승 추세는 유지되지만 단기는 숨 고르기 구간입니다."
-        return "중기 상승 추세가 유지되고 있으며 장기 구조도 무난한 편입니다."
+        if long_trend_label == "하락 추세":
+            return "중장기 구조는 상승 우위지만 장기 추세는 아직 완전히 돌아서지 않았습니다."
+        if short_trend_label == "횡보" or medium_trend_label == "횡보":
+            return "중장기 상승 우위는 유지되지만 단기 또는 중단기는 숨 고르기 구간입니다."
+        return "중장기 상승 우위가 유지되고 있으며 장기 구조도 비교적 안정적입니다."
 
-    if medium_trend_label == "하락 추세":
-        if short_trend_label == "상승 추세":
-            return "중기 하락 추세 속에서 단기 반등이 나타난 상태입니다."
-        if short_trend_label == "횡보":
-            return "중기 하락 추세는 이어지지만 단기는 반등 또는 정체 구간입니다."
-        return "중기 하락 추세가 이어지고 있으며 장기 구조도 약한 편입니다."
+    if trend_label == "하락 추세":
+        if short_trend_label == "상승 추세" or medium_trend_label == "상승 추세":
+            return "중장기 하락 추세 속에서 단기 또는 중단기 반등이 나타난 상태입니다."
+        if long_trend_label == "상승 추세":
+            return "중장기 구조는 약해졌지만 장기 추세는 아직 완전히 꺾이지 않았습니다."
+        if short_trend_label == "횡보" or medium_trend_label == "횡보":
+            return "중장기 하락 우위가 이어지지만 단기 또는 중단기는 반등 또는 정체 구간입니다."
+        return "중장기 하락 우위가 이어지고 있으며 장기 구조도 전반적으로 약합니다."
 
-    if short_trend_label == "상승 추세" and long_trend_label == "상승 추세":
-        return "장기 구조는 양호하지만 중기 기준으로는 아직 횡보 구간입니다."
-    if short_trend_label == "하락 추세" and long_trend_label == "하락 추세":
-        return "장기 구조도 약한 편이며 중기 기준으로는 횡보 하단에 머물고 있습니다."
-    if short_trend_label == "상승 추세":
-        return "단기 반등이 나타났지만 중기 기준으로는 아직 방향성이 정리되지 않았습니다."
-    if short_trend_label == "하락 추세":
-        return "단기 조정이 나타났지만 중기 기준으로는 아직 횡보 구간입니다."
-    return f"기준 추세는 중기 기준으로 {trend_label}입니다."
+    up_count = sum(label == "상승 추세" for label in labels)
+    down_count = sum(label == "하락 추세" for label in labels)
+    if up_count > down_count:
+        return (
+            "기간별 방향은 엇갈리지만 전체적으로는 상방 우세 속에서 "
+            "중장기 기준 횡보가 이어지고 있습니다."
+        )
+    if down_count > up_count:
+        return (
+            "기간별 방향은 엇갈리지만 전체적으로는 하방 우세 속에서 "
+            "중장기 기준 횡보가 이어지고 있습니다."
+        )
+    return f"단기부터 장기까지 방향이 엇갈리며, 기준 추세는 중장기 기준 {trend_label}입니다."
 
 
 def summarize_levels(
@@ -261,17 +289,16 @@ def _classify_alignment(*, close, fast, slow) -> str:
     return "횡보"
 
 
-def _classify_long_term(*, close, sma60, return_120d) -> str:
-    if pd.isna(close) or pd.isna(sma60) or pd.isna(return_120d):
+def _classify_price_vs_average(*, close, average) -> str:
+    if pd.isna(close) or pd.isna(average):
         return "횡보"
 
     close_value = float(close)
-    sma60_value = float(sma60)
-    return_120d_value = float(return_120d)
+    average_value = float(average)
 
-    if close_value > sma60_value and return_120d_value > 0:
+    if close_value > average_value:
         return "상승 추세"
-    if close_value < sma60_value and return_120d_value < 0:
+    if close_value < average_value:
         return "하락 추세"
     return "횡보"
 

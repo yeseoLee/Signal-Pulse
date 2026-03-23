@@ -18,6 +18,7 @@ def _result(
     trend_score: int,
     short_trend_label: str,
     medium_trend_label: str,
+    mid_long_trend_label: str,
     long_trend_label: str,
     price: float,
     return_20d: float,
@@ -43,6 +44,7 @@ def _result(
         },
         short_trend_label=short_trend_label,
         medium_trend_label=medium_trend_label,
+        mid_long_trend_label=mid_long_trend_label,
         long_trend_label=long_trend_label,
         trend_label=trend_label,
         trend_score=trend_score,
@@ -77,6 +79,7 @@ def test_html_report_renders_trend_and_price_zone_layout():
         trend_score=3,
         short_trend_label="상승 추세",
         medium_trend_label="상승 추세",
+        mid_long_trend_label="상승 추세",
         long_trend_label="상승 추세",
         price=70099.0,
         return_20d=4.2,
@@ -91,6 +94,7 @@ def test_html_report_renders_trend_and_price_zone_layout():
         trend_score=1,
         short_trend_label="상승 추세",
         medium_trend_label="횡보",
+        mid_long_trend_label="횡보",
         long_trend_label="상승 추세",
         price=192.5,
         return_20d=1.1,
@@ -126,9 +130,10 @@ def test_html_report_renders_trend_and_price_zone_layout():
     assert "추세 변화" in html
     assert "상승 추세" in html
     assert "횡보" in html
-    assert "기준 상승 추세" in html
+    assert "기준 상승 추세" not in html
     assert "단기 상승 추세" in html
-    assert "중기 횡보" in html
+    assert "중단기 횡보" in html
+    assert "중장기 횡보" in html
     assert "장기 상승 추세" in html
     assert "20일 수익률" in html
     assert "68,000~69,400원" in html
@@ -152,6 +157,7 @@ def test_html_report_sorts_index_before_equity_within_same_section():
         trend_score=3,
         short_trend_label="상승 추세",
         medium_trend_label="상승 추세",
+        mid_long_trend_label="상승 추세",
         long_trend_label="상승 추세",
         price=265099.0,
         return_20d=2.1,
@@ -167,6 +173,7 @@ def test_html_report_sorts_index_before_equity_within_same_section():
         trend_score=3,
         short_trend_label="상승 추세",
         medium_trend_label="상승 추세",
+        mid_long_trend_label="상승 추세",
         long_trend_label="상승 추세",
         price=70099.0,
         return_20d=4.2,

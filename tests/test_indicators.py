@@ -24,18 +24,24 @@ def _price_frame(*, start: str = "2024-01-01", periods: int = 160) -> pd.DataFra
 def test_indicator_stack_populates_moving_averages_and_returns():
     frame = _price_frame()
 
-    enriched = add_moving_averages(frame, windows={"fast": 5, "short": 20, "medium": 60})
+    enriched = add_moving_averages(
+        frame,
+        windows={"fast": 5, "short": 20, "medium": 60, "long": 120},
+    )
     enriched = add_return_indicators(enriched, windows=(20, 60, 120))
 
     latest = enriched.iloc[-1]
     assert latest["above_sma5"]
     assert latest["above_sma20"]
     assert latest["above_sma60"]
+    assert latest["above_sma120"]
     assert latest["sma5_gt_sma20"]
     assert latest["sma20_gt_sma60"]
+    assert latest["sma60_gt_sma120"]
     assert pd.notna(latest["sma_fast"])
     assert pd.notna(latest["sma_short"])
     assert pd.notna(latest["sma_medium"])
+    assert pd.notna(latest["sma_long"])
     assert pd.notna(latest["return_20d"])
     assert pd.notna(latest["return_60d"])
     assert pd.notna(latest["return_120d"])

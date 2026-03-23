@@ -8,7 +8,7 @@
 
 현재 리포트는 아래 3가지를 핵심으로 합니다.
 
-1. 5일/20일/60일 이동평균선 기반 단기/중기/장기 추세 판정
+1. 5일/20일/60일/120일 이동평균선 기반 단기/중단기/중장기/장기 추세 판정
 2. pivot 기반 지지/저항 가격대 탐지
 3. 20일 / 60일 / 120일 수익률 제공
 
@@ -23,7 +23,7 @@
 2. [`build_indicator_frame`](../src/watchlist_signal_bot/pipeline.py)
    이동평균과 수익률 컬럼을 추가합니다.
 3. [`detect_trend`](../src/watchlist_signal_bot/signals/technical_report.py)
-   `MA5`, `MA20`, `MA60`, `120일 수익률`을 기준으로 단기/중기/장기 추세와 기준 추세를 계산합니다.
+   `MA5`, `MA20`, `MA60`, `MA120`을 기준으로 단기/중단기/중장기/장기 추세와 기준 추세를 계산합니다.
 4. [`detect_support_resistance`](../src/watchlist_signal_bot/signals/technical_report.py)
    pivot high / low를 찾고 병합해 지지/저항 zone을 계산합니다.
 5. [`summarize_trend`](../src/watchlist_signal_bot/signals/technical_report.py)
@@ -40,6 +40,7 @@
 - `moving_average.fast`
 - `moving_average.short`
 - `moving_average.medium`
+- `moving_average.long`
 
 ### 수익률
 
@@ -67,11 +68,14 @@
 - `sma_fast`
 - `sma_short`
 - `sma_medium`
+- `sma_long`
 - `above_sma5`
 - `above_sma20`
 - `above_sma60`
+- `above_sma120`
 - `sma5_gt_sma20`
 - `sma20_gt_sma60`
+- `sma60_gt_sma120`
 
 ### 수익률
 
@@ -93,15 +97,21 @@
 - 최신 `sma_fast` (`MA5`)
 - 최신 `sma_short` (`MA20`)
 - 최신 `sma_medium` (`MA60`)
-- 최신 `return_120d`
+- 최신 `sma_long` (`MA120`)
 
 ### 단기 추세 규칙
+
+- `close > MA5` => `상승 추세`
+- `close < MA5` => `하락 추세`
+- 나머지 => `횡보`
+
+### 중단기 추세 규칙
 
 - `close > MA5 > MA20` => `상승 추세`
 - `close < MA5 < MA20` => `하락 추세`
 - 나머지 => `횡보`
 
-### 중기 추세 규칙
+### 중장기 추세 규칙
 
 - `close > MA20 > MA60` => `상승 추세`
 - `close < MA20 < MA60` => `하락 추세`
@@ -109,15 +119,15 @@
 
 ### 장기 추세 규칙
 
-- `close > MA60` 이고 `120일 수익률 > 0` => `상승 추세`
-- `close < MA60` 이고 `120일 수익률 < 0` => `하락 추세`
+- `close > MA60 > MA120` => `상승 추세`
+- `close < MA60 < MA120` => `하락 추세`
 - 나머지 => `횡보`
 
 ### 기준 추세와 내부 점수
 
-- 기준 추세(`trend_label`)는 `중기 추세`를 그대로 사용합니다.
-- 내부 `trend_score`는 `단기/중기/장기`를 각각 `상승=+1`, `횡보=0`, `하락=-1`로 환산해 합산합니다.
-- 점수 범위는 `-3~3` 입니다.
+- 기준 추세(`trend_label`)는 `중장기 추세`를 그대로 사용합니다.
+- 내부 `trend_score`는 `단기/중단기/중장기/장기`를 각각 `상승=+1`, `횡보=0`, `하락=-1`로 환산해 합산합니다.
+- 점수 범위는 `-4~4` 입니다.
 
 ## 지지/저항 함수
 
@@ -171,8 +181,8 @@
 
 예시:
 
-- `단기부터 장기까지 상승 구조가 비교적 고르게 정렬돼 있습니다.`
-- `장기 구조는 양호하지만 중기 기준으로는 아직 횡보 구간입니다.`
+- `단기부터 장기까지 상승 구조가 고르게 정렬돼 있습니다.`
+- `중장기 상승 우위는 유지되지만 단기 또는 중단기는 숨 고르기 구간입니다.`
 
 ### 지지/저항 문장
 
@@ -191,6 +201,7 @@
 
 - `short_trend_label`
 - `medium_trend_label`
+- `mid_long_trend_label`
 - `long_trend_label`
 - `trend_label`
 - `trend_score`
@@ -207,6 +218,7 @@
 - `sma5`
 - `sma20`
 - `sma60`
+- `sma120`
 - `return_20d`
 - `return_60d`
 - `return_120d`
@@ -243,9 +255,9 @@
 
 - 리포트 기준일
 - 추세별 종목 수
-- 종목별 단기/중기/장기 추세
+- 종목별 현재가
+- 종목별 추세 해석
 - 20/60/120일 수익률
-- 지지/저항 zone
 - GitHub Pages 링크
 
 ### HTML
@@ -259,7 +271,7 @@
 
 - 추세 분포 요약
 - 최근 추세 변화
-- 종목별 카드와 단기/중기/장기 추세 배지
+- 종목별 카드와 단기/중단기/중장기/장기 추세 배지
 - 지지/저항 zone
 - 실패 종목
 

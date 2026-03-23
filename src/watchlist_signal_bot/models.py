@@ -48,6 +48,7 @@ class AnalysisResult:
     indicators: dict[str, Any]
     short_trend_label: str
     medium_trend_label: str
+    mid_long_trend_label: str
     long_trend_label: str
     trend_label: str
     trend_score: int

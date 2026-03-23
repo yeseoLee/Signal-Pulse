@@ -14,6 +14,7 @@ def _result(
     trend_score: int,
     short_trend_label: str,
     medium_trend_label: str,
+    mid_long_trend_label: str,
     long_trend_label: str,
     asset_type: str = "equity",
     market: str = "US",
@@ -41,6 +42,7 @@ def _result(
         },
         short_trend_label=short_trend_label,
         medium_trend_label=medium_trend_label,
+        mid_long_trend_label=mid_long_trend_label,
         long_trend_label=long_trend_label,
         trend_label=trend_label,
         trend_score=trend_score,
@@ -96,6 +98,7 @@ def test_telegram_summary_renders_trend_sections_and_natural_language():
         trend_score=3,
         short_trend_label="상승 추세",
         medium_trend_label="상승 추세",
+        mid_long_trend_label="상승 추세",
         long_trend_label="상승 추세",
         return_20d=4.2,
         return_60d=8.1,
@@ -108,6 +111,7 @@ def test_telegram_summary_renders_trend_sections_and_natural_language():
         trend_score=2,
         short_trend_label="상승 추세",
         medium_trend_label="횡보",
+        mid_long_trend_label="횡보",
         long_trend_label="상승 추세",
         price=192.5,
         return_20d=1.1,
@@ -121,6 +125,7 @@ def test_telegram_summary_renders_trend_sections_and_natural_language():
         trend_score=-3,
         short_trend_label="하락 추세",
         medium_trend_label="하락 추세",
+        mid_long_trend_label="하락 추세",
         long_trend_label="하락 추세",
         price=118.0,
         return_20d=-8.0,
@@ -141,10 +146,11 @@ def test_telegram_summary_renders_trend_sections_and_natural_language():
     assert "[하락 추세]" in message
     assert "005930 (삼성전자)" in message
     assert "현재가: 70,000원" in message
-    assert "추세 구간: 단기 상승 추세 / 중기 상승 추세 / 장기 상승 추세" in message
+    assert "추세: 상승 추세 설명입니다." in message
     assert "수익률: 20일 +4.2% / 60일 +8.1% / 120일 +12.4%" in message
-    assert "지지: 하단에서는 68,000~69,400원 구간이 주요 지지대로 보입니다." in message
-    assert "저항: 상단에서는 $103.00~$105.00 구간이 주요 저항대로 보입니다." in message
+    assert "추세 구간:" not in message
+    assert "지지:" not in message
+    assert "저항:" not in message
     assert "요약:" not in message
     assert "RSI" not in message
     assert "BREAKOUT" not in message
@@ -163,6 +169,7 @@ def test_telegram_summary_sorts_index_before_equity_within_same_bucket():
         trend_score=3,
         short_trend_label="상승 추세",
         medium_trend_label="상승 추세",
+        mid_long_trend_label="상승 추세",
         long_trend_label="상승 추세",
         return_20d=4.2,
         return_60d=8.1,
@@ -178,6 +185,7 @@ def test_telegram_summary_sorts_index_before_equity_within_same_bucket():
         trend_score=3,
         short_trend_label="상승 추세",
         medium_trend_label="상승 추세",
+        mid_long_trend_label="상승 추세",
         long_trend_label="상승 추세",
         return_20d=2.1,
         return_60d=4.2,
@@ -189,4 +197,4 @@ def test_telegram_summary_sorts_index_before_equity_within_same_bucket():
     assert message.index("1. KOSPI (KOSPI)") < message.index("2. 005930 (삼성전자)")
     assert "현재가: 265,000" in message
     assert "현재가: 265,000원" not in message
-    assert "지지: 하단에서는 68,000~69,400 구간이 주요 지지대로 보입니다." in message
+    assert "지지:" not in message

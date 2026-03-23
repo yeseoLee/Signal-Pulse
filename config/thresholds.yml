@@ -4,6 +4,7 @@ moving_average:
   fast: 5
   short: 20
   medium: 60
+  long: 120
 
 returns:
   windows:
