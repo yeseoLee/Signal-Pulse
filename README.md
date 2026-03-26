@@ -1,9 +1,6 @@
 # Watchlist Signal Bot
 
-## Language
-
-- 한국어
-- [English](./README.en.md)
+**Language:** **한국어** | [English](docs/README.en.md)
 
 관심종목을 대상으로 **5일/20일/60일/120일 이동평균선 기반 추세**, **pivot 기반 지지/저항 가격대**, **20일/60일/120일 수익률**을 자동 계산해 Telegram과 HTML 리포트로 만드는 봇입니다.
 
@@ -192,3 +189,9 @@ make dry-run
 make render-workflows
 make check-workflows
 ```
+
+## 면책조항
+
+해당 저장소는 규칙 기반 자동화 워크플로우와 구현 방법을 공유하기 위한 프로젝트입니다.
+실제 투자 판단을 위한 자문, 권유, 보장된 신호 제공을 목적으로 하지 않습니다.
+실행 및 활용에 따른 책임은 사용자 본인에게 있습니다.
