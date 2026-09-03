@@ -25,3 +25,11 @@ manual:
       default: true
     publish_pages:
       default: false
+
+keepalive:
+  schedule:
+    - "0 6 * * 1"
+  options:
+    inactivity_days: 50
+    marker_file: ".github/keepalive.txt"
+    commit_message: "chore(keepalive): keep scheduled workflows enabled"

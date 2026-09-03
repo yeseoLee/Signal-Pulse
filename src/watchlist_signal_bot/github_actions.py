@@ -15,6 +15,7 @@ DEFAULT_MARKET_CHOICES = ["ALL", "KR", "US"]
 
 DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
     "daily": {
+        "kind": "signal",
         "file": ".github/workflows/daily.yml",
         "name": "Daily Signal Bot",
         "permissions": {
@@ -75,6 +76,7 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
         },
     },
     "manual": {
+        "kind": "signal",
         "file": ".github/workflows/manual.yml",
         "name": "Manual Signal Bot Test",
         "permissions": {
@@ -135,7 +137,34 @@ DEFAULT_WORKFLOW_CONFIG: dict[str, dict[str, Any]] = {
             ],
         },
     },
+    "keepalive": {
+        "kind": "keepalive",
+        "file": ".github/workflows/keepalive.yml",
+        "name": "Keepalive Bot Commit",
+        "permissions": {
+            "contents": "write",
+        },
+        "concurrency": {
+            "group": "keepalive-bot-commit",
+            "cancel-in-progress": False,
+        },
+        "dispatch_inputs": {
+            "force": {
+                "description": "Commit even when the repository is still active",
+                "required": False,
+                "type": "boolean",
+            },
+        },
+        "bot": {
+            "name": "github-actions[bot]",
+            "email": "41898282+github-actions[bot]@users.noreply.github.com",
+        },
+    },
 }
+
+DEFAULT_KEEPALIVE_INACTIVITY_DAYS = 50
+DEFAULT_KEEPALIVE_MARKER_FILE = ".github/keepalive.txt"
+DEFAULT_KEEPALIVE_COMMIT_MESSAGE = "chore(keepalive): keep scheduled workflows enabled"
 
 
 def load_github_actions_config(
@@ -177,6 +206,7 @@ def build_workflows(config: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {
         "daily": _build_daily_workflow(config.get("daily", {})),
         "manual": _build_manual_workflow(config.get("manual", {})),
+        "keepalive": _build_keepalive_workflow(config.get("keepalive", {})),
     }
 
 
@@ -199,6 +229,9 @@ def render_workflow(*, workflow: dict[str, Any]) -> str:
 
 
 def _render_jobs(*, workflow: dict[str, Any]) -> list[str]:
+    if workflow.get("kind") == "keepalive":
+        return _render_keepalive_job(workflow=workflow)
+
     lines: list[str] = []
     lines.extend(_render_build_job(workflow=workflow))
     lines.extend(_render_pages_deploy_job(workflow=workflow))
@@ -432,6 +465,51 @@ def _render_pages_deploy_job(*, workflow: dict[str, Any]) -> list[str]:
     return lines
 
 
+def _render_keepalive_job(*, workflow: dict[str, Any]) -> list[str]:
+    keepalive = workflow["keepalive"]
+    bot = workflow["bot"]
+    lines = [
+        "  keepalive:",
+        '    runs-on: "ubuntu-latest"',
+        "    env:",
+        f"      INACTIVITY_DAYS: {_yaml_scalar(keepalive['inactivity_days'])}",
+        f"      MARKER_FILE: {_yaml_scalar(keepalive['marker_file'])}",
+        f"      COMMIT_MESSAGE: {_yaml_scalar(keepalive['commit_message'])}",
+        "      FORCE: ${{ github.event.inputs.force || 'false' }}",
+        f"      BOT_NAME: {_yaml_scalar(bot['name'])}",
+        f"      BOT_EMAIL: {_yaml_scalar(bot['email'])}",
+        "    steps:",
+        '      - name: "Checkout"',
+        '        uses: "actions/checkout@v4"',
+        "",
+        '      - name: "Create keepalive bot commit"',
+        '        shell: "bash"',
+        "        run: |",
+        "          set -euo pipefail",
+        '          last_commit_epoch="$(git log -1 --format=%ct)"',
+        '          now_epoch="$(date -u +%s)"',
+        "          idle_days=$(( (now_epoch - last_commit_epoch) / 86400 ))",
+        '          echo "Days since last commit: ${idle_days}"',
+        '          if [[ "${FORCE}" != "true" && "${idle_days}" -lt "${INACTIVITY_DAYS}" ]]; then',
+        '            echo "Repository is still active. Skipping keepalive commit."',
+        "            exit 0",
+        "          fi",
+        '          mkdir -p "$(dirname "${MARKER_FILE}")"',
+        '          date -u +"%Y-%m-%dT%H:%M:%SZ" > "${MARKER_FILE}"',
+        '          git config user.name "${BOT_NAME}"',
+        '          git config user.email "${BOT_EMAIL}"',
+        '          git add "${MARKER_FILE}"',
+        "          if git diff --cached --quiet; then",
+        '            echo "Marker file is unchanged. Nothing to commit."',
+        "            exit 0",
+        "          fi",
+        '          git commit -m "${COMMIT_MESSAGE}"',
+        '          git push origin "HEAD:${GITHUB_REF_NAME}"',
+        "",
+    ]
+    return lines
+
+
 def _pages_bundle_condition(pages: dict[str, Any]) -> str | None:
     return pages.get("prepare_condition") or pages.get("deploy_condition")
 
@@ -469,6 +547,28 @@ def _build_manual_workflow(config: dict[str, Any]) -> dict[str, Any]:
         "GROUP": "${{ github.event.inputs.group }}",
         "MARKET": f"${{{{ github.event.inputs.market || '{market['default']}' }}}}",
         "DRY_RUN": f"${{{{ github.event.inputs.dry_run || '{_bool_string(dry_run)}' }}}}",
+    }
+    return workflow
+
+
+def _build_keepalive_workflow(config: dict[str, Any]) -> dict[str, Any]:
+    options = config.get("options", {})
+    workflow = _deep_copy(DEFAULT_WORKFLOW_CONFIG["keepalive"])
+    workflow["schedule"] = list(config.get("schedule", []))
+    workflow["dispatch_inputs"]["force"]["default"] = False
+    workflow["keepalive"] = {
+        "inactivity_days": _int_option(
+            options.get("inactivity_days"),
+            default=DEFAULT_KEEPALIVE_INACTIVITY_DAYS,
+        ),
+        "marker_file": _text_option(
+            options.get("marker_file"),
+            default=DEFAULT_KEEPALIVE_MARKER_FILE,
+        ),
+        "commit_message": _text_option(
+            options.get("commit_message"),
+            default=DEFAULT_KEEPALIVE_COMMIT_MESSAGE,
+        ),
     }
     return workflow
 
@@ -522,6 +622,22 @@ def _bool_option(option: dict[str, Any], *, default: bool) -> bool:
     if isinstance(value, str):
         return value.strip().lower() in {"1", "true", "yes", "on"}
     return bool(value)
+
+
+def _int_option(value: Any, *, default: int) -> int:
+    if isinstance(value, bool) or value is None:
+        return default
+    try:
+        parsed = int(value)
+    except (TypeError, ValueError):
+        return default
+    return parsed if parsed > 0 else default
+
+
+def _text_option(value: Any, *, default: str) -> str:
+    if not isinstance(value, str) or not value.strip():
+        return default
+    return value.strip()
 
 
 def _deep_copy(value: Any) -> Any:
