@@ -78,6 +78,10 @@ GitHub Actions 관련 설정을 관리합니다.
 - `daily.schedule`: 정기 실행 cron
 - `daily.options`: daily workflow 기본 옵션
 - `manual.options`: manual workflow 기본 옵션
+- `keepalive.schedule`: keepalive workflow 실행 cron
+- `keepalive.options.inactivity_days`: 마지막 커밋 이후 이 일수가 지나야 봇 커밋을 만듭니다 (기본 50)
+- `keepalive.options.marker_file`: 봇 커밋이 갱신할 마커 파일 경로 (기본 `.github/keepalive.txt`)
+- `keepalive.options.commit_message`: 봇 커밋 메시지
 
 중요:
 
@@ -90,6 +94,19 @@ GitHub Actions 관련 설정을 관리합니다.
 make render-workflows
 make check-workflows
 ```
+
+### 스케줄 유지 (keepalive bot commit)
+
+GitHub Actions의 `schedule` 트리거는 **저장소에 60일간 활동이 없으면 자동으로 비활성화**됩니다.
+`Daily Signal Bot`은 커밋을 만들지 않기 때문에, 개발이 멈추면 알림 없이 정기 실행이 끊깁니다.
+
+이를 막기 위해 [`.github/workflows/keepalive.yml`](./.github/workflows/keepalive.yml)이 주기적으로 봇 커밋을 만듭니다.
+
+- 마지막 커밋 이후 `inactivity_days`가 지났을 때만 마커 파일에 UTC 타임스탬프를 기록하고 커밋합니다.
+- 저장소가 활발하면 아무 커밋도 만들지 않아 히스토리가 지저분해지지 않습니다.
+- 커밋 작성자는 `github-actions[bot]`이며 `contents: write` 권한이 필요합니다.
+- `GITHUB_TOKEN`으로 push한 커밋은 다른 workflow를 다시 트리거하지 않으므로 무한 루프가 발생하지 않습니다.
+- Actions 탭의 `Keepalive Bot Commit`에서 `force` 옵션으로 즉시 실행해 동작을 확인할 수 있습니다.
 
 ## 리포트 구조
 

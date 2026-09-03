@@ -72,6 +72,10 @@ Defines the user-facing GitHub Actions settings.
 - `daily.schedule`: recurring cron entries
 - `daily.options`: defaults for scheduled runs
 - `manual.options`: defaults for manual runs
+- `keepalive.schedule`: cron entries for the keepalive workflow
+- `keepalive.options.inactivity_days`: days without a commit before a bot commit is made (default 50)
+- `keepalive.options.marker_file`: file the bot commit touches (default `.github/keepalive.txt`)
+- `keepalive.options.commit_message`: commit message used by the bot
 
 The HTML report is bundled into `public/`, uploaded as a GitHub Pages artifact, and then deployed by GitHub Actions.
 
@@ -81,6 +85,19 @@ After changing this config, regenerate the workflow files.
 make render-workflows
 make check-workflows
 ```
+
+### Keeping the schedule alive (keepalive bot commit)
+
+GitHub disables `schedule` triggers after **60 days without repository activity**.
+`Daily Signal Bot` never commits anything, so the schedule silently stops once development pauses.
+
+[`.github/workflows/keepalive.yml`](../.github/workflows/keepalive.yml) prevents that by making a periodic bot commit.
+
+- It writes a UTC timestamp to the marker file only after `inactivity_days` have passed since the last commit.
+- An active repository produces no commit at all, so history stays clean.
+- Commits are authored by `github-actions[bot]` and require `contents: write`.
+- Pushes made with `GITHUB_TOKEN` do not retrigger workflows, so there is no loop.
+- Run it from the Actions tab (`Keepalive Bot Commit`) with the `force` input to verify the behaviour.
 
 ## Report Structure
 
